@@ -16,8 +16,8 @@ object GithubArtifactDownloader {
 
   def getRepoZipAndExplode(githubZipUri: String, credentials: GithubCredentials): String = {
 
-    fileDownloader(githubZipUri, credentials)
-    logger.debug(s"saved archive to: $downloadZipAs")
+    getZipBallFromGithub(githubZipUri, credentials)
+    logger.debug(s"saved zip ball to: $downloadZipAs")
 
     val file = new File(downloadZipAs)
     logger.debug(s"${file.getTotalSpace}")
@@ -38,7 +38,7 @@ object GithubArtifactDownloader {
   }
 
 
-  def fileDownloader(githubZipUri: String, credentials: GithubCredentials) = {
+  private def getZipBallFromGithub(githubZipUri: String, credentials: GithubCredentials) = {
     logger.debug(s"Getting code archive from: $githubZipUri")
 
     val bs: HttpResponse[Array[Byte]] = Http(githubZipUri)
