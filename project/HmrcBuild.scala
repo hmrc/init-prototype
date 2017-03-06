@@ -23,16 +23,6 @@ object HmrcBuild extends Build {
     "commons-io" % "commons-io" % "2.5",
     "org.scalaj" %% "scalaj-http" % "2.3.0",
     "com.lihaoyi" %% "ammonite-ops" % "0.8.2"
-
-
-    //    "com.typesafe.play" %% "play-ws" % "2.4.3",
-//    "commons-io" % "commons-io" % "2.4",
-//    "org.apache.httpcomponents" % "httpcore" % "4.3.2",
-//    "org.apache.httpcomponents" % "httpclient" % "4.3.5",
-//    "org.scalatest" %% "scalatest" % "2.2.2" % "test",
-//    "org.pegdown" % "pegdown" % "1.4.2" % "test",
-//    "org.mockito" % "mockito-all" % "1.9.5" % "test",
-//    "com.github.tomakehurst" % "wiremock" % "1.52" % "test"
   )
 
   lazy val InitPrototype = Project(appName, file("."))
@@ -53,7 +43,6 @@ object AssemblySettings{
     assemblyJarName in assembly := "init-prototype.jar",
     assemblyMergeStrategy in assembly := {
       case PathList("org", "apache", "commons", "logging", xs@_*) => MergeStrategy.first
-      case PathList("play", "core", "server", xs@_*) => MergeStrategy.first
       case x =>
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
