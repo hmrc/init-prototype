@@ -23,7 +23,7 @@ object ArgParser {
   val DEFAULT_BOOTSTRAP_TAG = "0.1.0"
 
   case class Config(credentialsFile: String = "",
-                    gitApiBaseUrl: String = "",
+                    githubHost: String = "",
                     org: String = "",
                     templateRepoName: String = "",
                     targetRepoName: String = "",
@@ -44,8 +44,8 @@ object ArgParser {
       c.copy(credentialsFile = x)
     } text "github credentials file path"
 
-    opt[String]("git-api-base-url") action { (x, c) =>
-      c.copy(gitApiBaseUrl = x)
+    opt[String]("github-host") action { (x, c) =>
+      c.copy(githubHost = x)
     } text "github's REST api base url"
 
     opt[String]("git-org") action { (x, c) =>

@@ -45,18 +45,21 @@ object Main {
 
   private def getZipBallArtifactUrl(payloadDetails: Config): String = {
     import payloadDetails._
-    s"$gitApiBaseUrl/repos/$org/$templateRepoName/zipball/master"
+    s"https://$githubHost/api/v3/repos/$org/$templateRepoName/zipball/master"
   }
 
 
-  def gitInit(localRepoPath: String, repoName: String, token: String) = {
+  def gitInit(localRepoPath: String, config: Config, token: String) = {
     logger.debug(s"$localRepoPath")
     val dir = Path(localRepoPath)
     %('git, "init" , ".")(dir)
     %('git, "add", ".", "-A")(dir)
-    %('git, "commit" , "-m", s"Creating new prototype $repoName")(dir)
-    %('git, "remote" , "add", "origin", s"http://example.com/HMRC/$repoName.git")(dir)
-    %('git, "push" , "--set-upstream", "origin", "master")(dir)
+    %('git, "commit" , "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
+    %('git, "remote" , "add", "origin", s"https://$token:x-oauth-basic@${config.githubHost}/${config.org}/${config.targetRepoName}.git")(dir)
+    val pushResult = %%('git, "push" , "--set-upstream", "origin", "master")(dir)
+    if(pushResult.exitCode != 0) {
+      throw new RuntimeException(s"Unable to push repo (${config.targetRepoName})")
+    }
   }
 
 
@@ -65,7 +68,7 @@ object Main {
 
     val githubZipUri = getZipBallArtifactUrl(config)
     val localRepoPath = GithubArtifactDownloader.getRepoZipAndExplode(githubZipUri, credentials)
-    gitInit(localRepoPath, config.targetRepoName, credentials.token)
+    gitInit(localRepoPath, config, credentials.token)
     
 
   }

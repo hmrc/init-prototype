@@ -30,6 +30,7 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints {
 
       GithubArtifactDownloader.getRepoZipAndExplode(url, GithubCredentials("user1", token))
 
+      
 
     }
   }
