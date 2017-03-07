@@ -55,7 +55,7 @@ object Main {
     %('git, "init" , ".")(dir)
     %('git, "add", ".", "-A")(dir)
     %('git, "commit" , "-m", s"Creating new prototype $repoName")(dir)
-    %('git, "remote" , "add", "origin", s"https://$token:x-oauth-basic@github.tools.tax.service.gov.uk/HMRC/$repoName.git")(dir)
+    %('git, "remote" , "add", "origin", s"http://example.com/HMRC/$repoName.git")(dir)
     %('git, "push" , "--set-upstream", "origin", "master")(dir)
   }
 
