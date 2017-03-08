@@ -18,6 +18,7 @@ package uk.gov.hmrc.initprototype
 
 import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
+import org.apache.commons.io.FileUtils
 import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
@@ -67,7 +68,7 @@ object Main {
     val credentials = GithubCredentials(config.credentialsFile)
 
     val githubZipUri = getZipBallArtifactUrl(config)
-    val localRepoPath = GithubArtifactDownloader.getRepoZipAndExplode(githubZipUri, credentials)
+    val localRepoPath = new GithubArtifactDownloader(FileUtils.getTempDirectoryPath).getRepoZipAndExplode(githubZipUri, credentials)
     gitInit(localRepoPath, config, credentials.token)
     
 

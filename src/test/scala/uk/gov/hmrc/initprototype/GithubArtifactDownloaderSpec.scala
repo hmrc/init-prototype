@@ -1,23 +1,27 @@
 package uk.gov.hmrc.initprototype
 
-import java.io.File
+import java.io.{File, FileInputStream}
 
-import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitionBuilder}
+import ammonite.ops.{%, _}
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitionBuilder}
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod._
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Matchers}
+import org.zeroturnaround.zip.ZipUtil
 
-import scala.io.Source
+class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers {
 
-class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints {
-
+  type FilePath = String
+  private val tempDirectoryPath = FileUtils.getTempDirectoryPath
+  val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath)
 
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
       val token = "token123"
       val url = s"$endpointMockUrl/xyz"
+
 
       givenGitHubExpects(
         method = GET,
@@ -26,12 +30,13 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints {
           "Authorization" -> s"token $token",
           "content-type" -> "application/json"
         ),
-        willRespondWithFileContents = (200, Some("test.zip")))
+        willRespondWithFileContents = (200, Some(zipContentsOfDir(getClass.getClassLoader.getResource("test-dir").getPath))))
 
-      GithubArtifactDownloader.getRepoZipAndExplode(url, GithubCredentials("user1", token))
+      val explodedPath = githubArtifactDownloader.getRepoZipAndExplode(url, GithubCredentials("user1", token))
 
-      
-
+      explodedPath shouldBe s"${tempDirectoryPath}prototype-template-archive.zip/foo"
+      val lsResult = %%('ls)(Path(explodedPath))
+      lsResult.out.string should startWith("bar.js")
     }
   }
 
@@ -39,17 +44,14 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints {
                              method: RequestMethod,
                              url: String,
                              extraHeaders: Map[String, String] = Map(),
-                             willRespondWithFileContents: (Int, Option[String])): Unit = {
+                             willRespondWithFileContents: (Int, Option[FilePath])): Unit = {
 
     val builder = extraHeaders.foldLeft(new MappingBuilder(method, urlEqualTo(url))) { (acc, header) =>
       acc.withHeader(header._1, equalTo(header._2))
     }
 
-
-
     val fileContents =
-      willRespondWithFileContents._2.map(file => IOUtils.toByteArray(getClass.getClassLoader.getResourceAsStream(file)))
-
+      willRespondWithFileContents._2.map(file => IOUtils.toByteArray(new FileInputStream(file)))
 
     val response: ResponseDefinitionBuilder = new ResponseDefinitionBuilder()
       .withStatus(willRespondWithFileContents._1)
@@ -61,6 +63,12 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints {
     builder.willReturn(resp)
 
     endpointMock.register(builder)
+  }
+
+  def zipContentsOfDir(path: String): String = {
+    val zipFilepath = s"${FileUtils.getTempDirectoryPath}test.zip"
+    ZipUtil.pack(new File(path), new File(zipFilepath))
+    zipFilepath
   }
 
 

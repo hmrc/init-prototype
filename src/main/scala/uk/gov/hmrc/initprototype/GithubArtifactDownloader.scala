@@ -10,9 +10,9 @@ import uk.gov.hmrc.initprototype.Main.logger
 import scala.language.postfixOps
 import scalaj.http.{Http, HttpOptions, HttpResponse}
 
-object GithubArtifactDownloader {
+class GithubArtifactDownloader(downloadPath: String ) {
 
-  val downloadZipAs: String = s"/tmp/prototype-template-archive.zip"
+  val downloadZipAs: String = s"$downloadPath/prototype-template-archive.zip"
 
   def getRepoZipAndExplode(githubZipUri: String, credentials: GithubCredentials): String = {
 
