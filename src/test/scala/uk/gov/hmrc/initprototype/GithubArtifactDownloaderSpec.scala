@@ -66,7 +66,7 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
   }
 
   def zipContentsOfDir(path: String): String = {
-    val zipFilepath = s"${FileUtils.getTempDirectoryPath}test.zip"
+    val zipFilepath = FileUtils.getTempDirectory.toPath.resolve("test.zip").toString
     ZipUtil.pack(new File(path), new File(zipFilepath))
     zipFilepath
   }
