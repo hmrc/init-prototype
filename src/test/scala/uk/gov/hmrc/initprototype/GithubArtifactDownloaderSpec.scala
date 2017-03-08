@@ -14,8 +14,8 @@ import org.zeroturnaround.zip.ZipUtil
 class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers {
 
   type FilePath = String
-  private val tempDirectoryPath = FileUtils.getTempDirectoryPath
-  val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath)
+  private val tempDirectoryPath = FileUtils.getTempDirectory
+  val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath.getAbsolutePath)
 
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
@@ -34,7 +34,7 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
 
       val explodedPath = githubArtifactDownloader.getRepoZipAndExplode(url, GithubCredentials("user1", token))
 
-      explodedPath shouldBe s"${tempDirectoryPath}prototype-template-archive.zip/foo"
+      explodedPath shouldBe tempDirectoryPath.toPath.resolve("prototype-template-archive.zip/foo").toString
       val lsResult = %%('ls)(Path(explodedPath))
       lsResult.out.string should startWith("bar.js")
     }
