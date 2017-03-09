@@ -48,6 +48,7 @@ object AssemblySettings{
     assemblyJarName in assembly := "init-prototype.jar",
     assemblyMergeStrategy in assembly := {
       case PathList("org", "apache", "commons", "logging", xs@_*) => MergeStrategy.first
+      case PathList("play", "core", "server", xs@_*) => MergeStrategy.first
       case x =>
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
