@@ -49,7 +49,7 @@ trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfter
     endpointServer.start()
   }
 
-  def printMappings(): Unit ={
+  def printMappings(): Unit = {
     endpointMock.allStubMappings().getMappings.toList.foreach { s =>
       println(s)
     }
