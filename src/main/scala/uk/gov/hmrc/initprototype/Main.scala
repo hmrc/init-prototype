@@ -47,6 +47,8 @@ object Main {
   private def getZipBallArtifactUrl(payloadDetails: Config): String = {
     import payloadDetails._
     s"https://$githubHost/api/v3/repos/$org/$templateRepoName/zipball/master"
+
+//    val "https://api.github.com/repos/alphagov/govuk_prototype_kit/releases/latest"
   }
 
 
@@ -68,7 +70,8 @@ object Main {
     val credentials = GithubCredentials(config.credentialsFile)
 
     val githubZipUri = getZipBallArtifactUrl(config)
-    val localRepoPath = new GithubArtifactDownloader(FileUtils.getTempDirectoryPath).getRepoZipAndExplode(githubZipUri, credentials)
+    val artifactDownloadPath = FileUtils.getTempDirectory.toPath.resolve("prototype-template-archive.zip").toString
+    val localRepoPath = new GithubArtifactDownloader(artifactDownloadPath).getRepoZipAndExplode(githubZipUri, credentials)
     gitInit(localRepoPath, config, credentials.token)
     
 

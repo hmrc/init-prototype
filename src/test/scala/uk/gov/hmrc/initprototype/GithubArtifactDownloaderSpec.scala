@@ -2,20 +2,24 @@ package uk.gov.hmrc.initprototype
 
 import java.io.{File, FileInputStream}
 
-import ammonite.ops.{%, _}
+import ammonite.ops._
 import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, urlEqualTo}
 import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitionBuilder}
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod._
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import org.zeroturnaround.zip.ZipUtil
 
-class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers {
+class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers with BeforeAndAfterAll {
 
   type FilePath = String
   private val tempDirectoryPath = FileUtils.getTempDirectory
-  val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath.getAbsolutePath)
+  val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath.toPath.resolve("some-archive.zip").toString)
+
+  override def afterAll() {
+    FileUtils.deleteQuietly(tempDirectoryPath)
+  }
 
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
@@ -34,7 +38,7 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
 
       val explodedPath = githubArtifactDownloader.getRepoZipAndExplode(url, GithubCredentials("user1", token))
 
-      explodedPath shouldBe tempDirectoryPath.toPath.resolve("prototype-template-archive.zip/foo").toString
+      explodedPath shouldBe tempDirectoryPath.toPath.resolve("some-archive.zip/foo").toString
       val lsResult = %%('ls)(Path(explodedPath))
       lsResult.out.string should startWith("bar.js")
     }

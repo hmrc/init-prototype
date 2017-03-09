@@ -10,16 +10,14 @@ import uk.gov.hmrc.initprototype.Main.logger
 import scala.language.postfixOps
 import scalaj.http.{Http, HttpOptions, HttpResponse}
 
-class GithubArtifactDownloader(downloadPath: String ) {
-
-  val downloadZipAs: String = s"$downloadPath/prototype-template-archive.zip"
+class GithubArtifactDownloader(artifactDownloadPath: String ) {
 
   def getRepoZipAndExplode(githubZipUri: String, credentials: GithubCredentials): String = {
 
     getZipBallFromGithub(githubZipUri, credentials)
-    logger.debug(s"saved zip ball to: $downloadZipAs")
+    logger.debug(s"saved zip ball to: $artifactDownloadPath")
 
-    val file = new File(downloadZipAs)
+    val file = new File(artifactDownloadPath)
     logger.debug(s"${file.getTotalSpace}")
     ZipUtil.explode(file)
     logger.debug(s"Zip file exploded successfully")
@@ -28,7 +26,7 @@ class GithubArtifactDownloader(downloadPath: String ) {
 
 
   private def getExplodedRootPath() = {
-    val file = new File(downloadZipAs)
+    val file = new File(artifactDownloadPath)
     val listFiles = file.listFiles(FileFilterUtils.directoryFileFilter().asInstanceOf[FileFilter])
     logger.debug("Dirs found:")
     logger.debug(listFiles.toList.mkString("\n"))
@@ -42,7 +40,6 @@ class GithubArtifactDownloader(downloadPath: String ) {
     logger.debug(s"Getting code archive from: $githubZipUri")
 
     val bs: HttpResponse[Array[Byte]] = Http(githubZipUri)
-//      .auth(credentials.user, credentials.token)
       .header("Authorization", s"token ${credentials.token}")
       .header("content-type" , "application/json")
       .option(HttpOptions.followRedirects(true))
@@ -53,12 +50,12 @@ class GithubArtifactDownloader(downloadPath: String ) {
       logger.error(s"Looks like we have encountered an error downloading the zip file from github:\n${new String(bs.body)}")
       System.exit(-1)
     }
-    logger.debug(s"Got ${bs.body.size} bytes from $githubZipUri... saving it to $downloadZipAs")
+    logger.debug(s"Got ${bs.body.size} bytes from $githubZipUri... saving it to $artifactDownloadPath")
 
-    val file = new File(downloadZipAs)
+    val file = new File(artifactDownloadPath)
     FileUtils.deleteQuietly(file)
     FileUtils.writeByteArrayToFile(file, bs.body)
-    logger.debug(s"Saved file: $downloadZipAs")
+    logger.debug(s"Saved file: $artifactDownloadPath")
   }
 
 
