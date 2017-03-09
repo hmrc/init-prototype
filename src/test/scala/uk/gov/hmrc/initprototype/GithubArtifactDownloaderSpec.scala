@@ -33,11 +33,6 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
   private val tempDirectoryPath = FileUtils.getTempDirectory
   val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath.toPath.resolve("some-archive.zip").toString)
 
-  override def afterAll() {
-    super.afterAll()
-    FileUtils.deleteQuietly(tempDirectoryPath)
-  }
-
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
       val token = "token123"
