@@ -56,8 +56,7 @@ object AssemblySettings{
     artifact in(Compile, assembly) := {
       val art = (artifact in(Compile, assembly)).value
       art.copy(`classifier` = Some("assembly"))
-    },
-    logLevel in assembly := Level.Debug
+    }
   )
 }
 
