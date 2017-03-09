@@ -31,12 +31,11 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
         method = GET,
         url = "/xyz",
         extraHeaders = Map(
-          "Authorization" -> s"token $token",
           "content-type" -> "application/json"
         ),
         willRespondWithFileContents = (200, Some(zipContentsOfDir(getClass.getClassLoader.getResource("test-dir").getPath))))
 
-      val explodedPath = githubArtifactDownloader.getRepoZipAndExplode(url, GithubCredentials("user1", token))
+      val explodedPath = githubArtifactDownloader.getRepoZipAndExplode(url)
 
       explodedPath shouldBe tempDirectoryPath.toPath.resolve("some-archive.zip/foo").toString
       val lsResult = %%('ls)(Path(explodedPath))

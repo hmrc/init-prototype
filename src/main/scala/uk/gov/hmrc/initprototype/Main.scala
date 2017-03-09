@@ -23,6 +23,8 @@ import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
 
+import scala.util.{Failure, Success, Try}
+
 object Main {
 
 
@@ -44,37 +46,48 @@ object Main {
     }
   }
 
-  private def getZipBallArtifactUrl(payloadDetails: Config): String = {
-    import payloadDetails._
-    s"https://$githubHost/api/v3/repos/$org/$templateRepoName/zipball/master"
-
-//    val "https://api.github.com/repos/alphagov/govuk_prototype_kit/releases/latest"
-  }
 
 
   def gitInit(localRepoPath: String, config: Config, token: String) = {
+
+    def getGithubApiUri(pta: String) = s"https://$pta:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
+
     logger.debug(s"$localRepoPath")
     val dir = Path(localRepoPath)
     %('git, "init" , ".")(dir)
     %('git, "add", ".", "-A")(dir)
     %('git, "commit" , "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
-    %('git, "remote" , "add", "origin", s"https://$token:x-oauth-basic@${config.githubHost}/${config.org}/${config.targetRepoName}.git")(dir)
-    val pushResult = %%('git, "push" , "--set-upstream", "origin", "master")(dir)
-    if(pushResult.exitCode != 0) {
-      throw new RuntimeException(s"Unable to push repo (${config.targetRepoName})")
+    %('git, "remote", "add", "origin", getGithubApiUri(token))(dir)
+
+    // we use Try to protect the token from being printed on the console in case of an error
+    val tryOfPushResult = Try(%%('git, "push", "--set-upstream", "origin", "master")(dir))
+
+    def throwError = throw new RuntimeException(s"Unable to push to remote repo ${getGithubApiUri("xxxxxxxx")}")
+
+    tryOfPushResult match {
+      case Success(pushResult) =>
+        if (pushResult.exitCode != 0) {
+          throwError
+        }
+      case Failure(t) => throwError
     }
+
   }
 
 
   def start(config: Config): Unit = {
     val credentials = GithubCredentials(config.credentialsFile)
 
-    val githubZipUri = getZipBallArtifactUrl(config)
-    val artifactDownloadPath = FileUtils.getTempDirectory.toPath.resolve("prototype-template-archive.zip").toString
-    val localRepoPath = new GithubArtifactDownloader(artifactDownloadPath).getRepoZipAndExplode(githubZipUri, credentials)
-    gitInit(localRepoPath, config, credentials.token)
-    
+    val eitherErrorOrUrl = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(config.templateRepoApiUrl)
 
+    eitherErrorOrUrl match {
+      case Left(e) =>
+        throw new RuntimeException(e)
+      case Right(githubZipUrl) =>
+        val artifactDownloadPath = FileUtils.getTempDirectory.toPath.resolve("prototype-template-archive.zip").toString
+        val localRepoPath = new GithubArtifactDownloader(artifactDownloadPath).getRepoZipAndExplode(githubZipUrl)
+        gitInit(localRepoPath, config, credentials.token)
+    }
   }
 
 }

@@ -12,9 +12,9 @@ import scalaj.http.{Http, HttpOptions, HttpResponse}
 
 class GithubArtifactDownloader(artifactDownloadPath: String ) {
 
-  def getRepoZipAndExplode(githubZipUri: String, credentials: GithubCredentials): String = {
+  def getRepoZipAndExplode(githubZipUri: String): String = {
 
-    getZipBallFromGithub(githubZipUri, credentials)
+    getZipBallFromGithub(githubZipUri)
     logger.debug(s"saved zip ball to: $artifactDownloadPath")
 
     val file = new File(artifactDownloadPath)
@@ -36,11 +36,10 @@ class GithubArtifactDownloader(artifactDownloadPath: String ) {
   }
 
 
-  private def getZipBallFromGithub(githubZipUri: String, credentials: GithubCredentials) = {
+  private def getZipBallFromGithub(githubZipUri: String) = {
     logger.debug(s"Getting code archive from: $githubZipUri")
 
     val bs: HttpResponse[Array[Byte]] = Http(githubZipUri)
-      .header("Authorization", s"token ${credentials.token}")
       .header("content-type" , "application/json")
       .option(HttpOptions.followRedirects(true))
       .asBytes
@@ -50,7 +49,7 @@ class GithubArtifactDownloader(artifactDownloadPath: String ) {
       logger.error(s"Looks like we have encountered an error downloading the zip file from github:\n${new String(bs.body)}")
       System.exit(-1)
     }
-    logger.debug(s"Got ${bs.body.size} bytes from $githubZipUri... saving it to $artifactDownloadPath")
+    logger.debug(s"Got ${bs.body.length} bytes from $githubZipUri... saving it to $artifactDownloadPath")
 
     val file = new File(artifactDownloadPath)
     FileUtils.deleteQuietly(file)

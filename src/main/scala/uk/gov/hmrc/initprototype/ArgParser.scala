@@ -23,9 +23,9 @@ object ArgParser {
   val DEFAULT_BOOTSTRAP_TAG = "0.1.0"
 
   case class Config(credentialsFile: String = "",
-                    githubHost: String = "",
-                    org: String = "",
-                    templateRepoName: String = "",
+                    templateRepoApiUrl: String = "",
+                    targetGithubHost: String = "",
+                    targetOrg: String = "",
                     targetRepoName: String = "",
                     verbose: Boolean = false)
 
@@ -44,17 +44,17 @@ object ArgParser {
       c.copy(credentialsFile = x)
     } text "github credentials file path"
 
-    opt[String]("github-host") action { (x, c) =>
-      c.copy(githubHost = x)
-    } text "github's REST api base url"
+    opt[String]("target-github-host") action { (x, c) =>
+      c.copy(targetGithubHost = x)
+    } text "target github's REST api base url (ie: github.x.x.x.uk)"
 
-    opt[String]("git-org") action { (x, c) =>
-      c.copy(org = x)
-    } text "github's org name"
+    opt[String]("target-git-org") action { (x, c) =>
+      c.copy(targetOrg = x)
+    } text "target github's org name"
 
-    opt[String]("template-repo-name") action { (x, c) =>
-      c.copy(templateRepoName = x)
-    } text "the name of the template github repository"
+    opt[String]("template-repo-api-url") action { (x, c) =>
+      c.copy(templateRepoApiUrl = x)
+    } text "the api url of the template github repository (eg: 'https://api.github.com/repos/alphagov/govuk_prototype_kit')"
 
     opt[String]("target-repo-name") action { (x, c) =>
       c.copy(targetRepoName = x)
