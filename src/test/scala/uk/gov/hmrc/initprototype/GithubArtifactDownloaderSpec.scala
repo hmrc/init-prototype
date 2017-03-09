@@ -11,16 +11,13 @@ import org.apache.commons.io.{FileUtils, IOUtils}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import org.zeroturnaround.zip.ZipUtil
 
-class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers with BeforeAndAfterAll {
+class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers {
 
   type FilePath = String
   private val tempDirectoryPath = FileUtils.getTempDirectory
   val githubArtifactDownloader = new GithubArtifactDownloader(tempDirectoryPath.toPath.resolve("some-archive.zip").toString)
 
-  override def afterAll() {
-    FileUtils.deleteQuietly(tempDirectoryPath)
-  }
-
+  
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
       val token = "token123"
