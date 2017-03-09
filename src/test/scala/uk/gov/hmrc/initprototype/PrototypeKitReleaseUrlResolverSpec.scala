@@ -70,8 +70,8 @@ class PrototypeKitReleaseUrlResolverSpec extends FunSpec with WireMockEndpoints 
 
       val jsonReponse =
         """{
-         |  "url":"https://api.github.com/repos/alphagov/govuk_prototype_kit/releases/5313431",
-         |  "assets_url":"https://api.github.com/repos/alphagov/govuk_prototype_kit/releases/5313431/assets"
+         |  "url":"https://api.github.com/repos/alphagov/govuk_prototype_kit",
+         |  "assets_url":"https://api.github.com/repos/alphagov/govuk_prototype_kit"
          |}""".stripMargin
 
       givenGitHubExpects(
