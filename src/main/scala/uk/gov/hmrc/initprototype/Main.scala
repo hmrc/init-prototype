@@ -54,14 +54,14 @@ object Main {
 
     logger.debug(s"$localRepoPath")
     val dir = Path(localRepoPath)
-//    %('git, "init" , ".")(dir)
-    %('git, "clone" , repoUrl)(dir)
+    %('git, "init" , ".")(dir)
+//    %('git, "clone" , repoUrl)(dir)
     %('git, "add", ".", "-A")(dir)
     %('git, "commit" , "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
     %('git, "remote", "add", "origin", repoUrl)(dir)
 
     // we use Try to protect the token from being printed on the console in case of an error
-    val tryOfPushResult = Try(%%('git, "push", "--set-upstream", "origin", "master")(dir))
+    val tryOfPushResult = Try(%%('git, "push", "-f",  "--set-upstream", "origin", "master")(dir))
 
     def throwError = throw new RuntimeException(s"Unable to push to remote repo ${repoUrl.replace(token , "xxxxxxxx")}")
 
