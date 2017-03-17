@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitio
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod._
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import org.zeroturnaround.zip.ZipUtil
 
 class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers {
@@ -38,6 +38,7 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
       val token = "token123"
       val url = s"$endpointMockUrl/xyz"
 
+      
 
       givenGitHubExpects(
         method = GET,

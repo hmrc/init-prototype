@@ -50,19 +50,20 @@ object Main {
 
   def gitInit(localRepoPath: String, config: Config, token: String) = {
 
-    def getGithubApiUri(pta: String) = s"https://$pta:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
+    val repoUrl = s"https://$token:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
 
     logger.debug(s"$localRepoPath")
     val dir = Path(localRepoPath)
-    %('git, "init" , ".")(dir)
+//    %('git, "init" , ".")(dir)
+    %('git, "clone" , repoUrl)(dir)
     %('git, "add", ".", "-A")(dir)
     %('git, "commit" , "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
-    %('git, "remote", "add", "origin", getGithubApiUri(token))(dir)
+    %('git, "remote", "add", "origin", repoUrl)(dir)
 
     // we use Try to protect the token from being printed on the console in case of an error
     val tryOfPushResult = Try(%%('git, "push", "--set-upstream", "origin", "master")(dir))
 
-    def throwError = throw new RuntimeException(s"Unable to push to remote repo ${getGithubApiUri("xxxxxxxx")}")
+    def throwError = throw new RuntimeException(s"Unable to push to remote repo ${repoUrl.replace(token , "xxxxxxxx")}")
 
     tryOfPushResult match {
       case Success(pushResult) =>
