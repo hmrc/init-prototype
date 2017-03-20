@@ -23,7 +23,10 @@ import scalaj.http.{Http, HttpResponse}
 object PrototypeKitReleaseUrlResolver {
 
 
-  def getLatestZipballUrl(repoApiUrl: String): Either [String , String] = {
+  type ZipBallUrl = String
+  type ErrorMessage = String
+
+  def getLatestZipballUrl(repoApiUrl: String): Either [ErrorMessage , ZipBallUrl] = {
     require(!repoApiUrl.endsWith("/"), s"repository api url should not end '/': $repoApiUrl")
 
     val latestReleaseUrl = s"$repoApiUrl/releases/latest"

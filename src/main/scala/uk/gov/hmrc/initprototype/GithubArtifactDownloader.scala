@@ -26,22 +26,23 @@ import uk.gov.hmrc.initprototype.Main.logger
 import scala.language.postfixOps
 import scalaj.http.{Http, HttpOptions, HttpResponse}
 
-class GithubArtifactDownloader(artifactDownloadPath: String ) {
+class GithubArtifactDownloader() {
 
-  def getRepoZipAndExplode(githubZipUri: String): String = {
+  def getRepoZipAndExplode(githubZipUri: String, artifactDownloadPath: String): String = {
 
-    getZipBallFromGithub(githubZipUri)
+    FileUtils.deleteDirectory(new File(artifactDownloadPath))
+    getZipBallFromGithub(githubZipUri, artifactDownloadPath)
     logger.debug(s"saved zip ball to: $artifactDownloadPath")
 
     val file = new File(artifactDownloadPath)
     logger.debug(s"${file.getTotalSpace}")
     ZipUtil.explode(file)
     logger.debug(s"Zip file exploded successfully")
-    getExplodedRootPath()
+    getExplodedRootPath(artifactDownloadPath)
   }
 
 
-  private def getExplodedRootPath() = {
+  private def getExplodedRootPath(artifactDownloadPath: String) = {
     val file = new File(artifactDownloadPath)
     val listFiles = file.listFiles(FileFilterUtils.directoryFileFilter().asInstanceOf[FileFilter])
     logger.debug("Dirs found:")
@@ -52,7 +53,7 @@ class GithubArtifactDownloader(artifactDownloadPath: String ) {
   }
 
 
-  private def getZipBallFromGithub(githubZipUri: String) = {
+  private def getZipBallFromGithub(githubZipUri: String, artifactDownloadPath: String) = {
     logger.debug(s"Getting code archive from: $githubZipUri")
 
     val bs: HttpResponse[Array[Byte]] = Http(githubZipUri)
@@ -68,7 +69,7 @@ class GithubArtifactDownloader(artifactDownloadPath: String ) {
     logger.debug(s"Got ${bs.body.length} bytes from $githubZipUri... saving it to $artifactDownloadPath")
 
     val file = new File(artifactDownloadPath)
-    FileUtils.deleteQuietly(file)
+//    FileUtils.deleteQuietly(file)
     FileUtils.writeByteArrayToFile(file, bs.body)
     logger.debug(s"Saved file: $artifactDownloadPath")
   }
