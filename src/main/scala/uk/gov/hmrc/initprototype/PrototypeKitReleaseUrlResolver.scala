@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 package uk.gov.hmrc.initprototype
 
 import play.api.libs.json.Json
-
-import scalaj.http.{Http, HttpResponse}
+import scalaj.http.{Http, HttpOptions, HttpResponse}
 
 object PrototypeKitReleaseUrlResolver {
 
@@ -30,7 +29,9 @@ object PrototypeKitReleaseUrlResolver {
     require(!repoApiUrl.endsWith("/"), s"repository api url should not end '/': $repoApiUrl")
 
     val latestReleaseUrl = s"$repoApiUrl/releases/latest"
-    val response: HttpResponse[String] = Http(latestReleaseUrl).header("content-type" , "application/json").asString
+    val response: HttpResponse[String] = Http(latestReleaseUrl).header("content-type" , "application/json")
+      .option(HttpOptions.followRedirects(true))
+      .asString
 
     val responseBody = response.body
     if(response.isNotError) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,49 @@ class PrototypeKitReleaseUrlResolverSpec extends FunSpec with WireMockEndpoints 
             |  "tarball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/tarball/v5.1.0",
             |  "zipball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0",
             |  "body": "bla"
-            |}""".stripMargin)))
+            |}""".stripMargin), Map.empty))
 
+
+      PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl).right.value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
+
+    }
+
+    it("should follow redirects retrieved from github") {
+
+      givenGitHubExpects(
+        method = GET,
+        url = "/releases/latest",
+        extraHeaders = Map(
+          "content-type" -> "application/json"
+        ),
+        willRespondWith = (301, Some(
+          s"""{
+            |  "message": "Moved Permanently",
+            |  "url": "${endpointMockUrl}/releases/redirect-target",
+            |  "documentation_url": "https://developer.github.com/v3/#http-redirects"
+            |}
+            |""".stripMargin), Map("Location" -> s"${endpointMockUrl}/releases/redirect-target")))
+
+
+      givenGitHubExpects(
+        method = GET,
+        url = "/releases/redirect-target",
+        extraHeaders = Map(
+          "content-type" -> "application/json"
+        ),
+        willRespondWith = (200, Some(
+          """{
+            |  "url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/releases/5313431",
+            |  "assets_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/releases/5313431/assets",
+            |  "upload_url": "https://uploads.github.com/repos/alphagov/govuk_prototype_kit/releases/5313431/assets{?name,label}",
+            |  "html_url": "https://github.com/alphagov/govuk_prototype_kit/releases/tag/v5.1.0",
+            |  "id": 5313431,
+            |  "stuff":"..........",
+            |  "prerelease": false,
+            |  "tarball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/tarball/v5.1.0",
+            |  "zipball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0",
+            |  "body": "bla"
+            |}""".stripMargin), Map.empty))
 
       PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl).right.value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
 
@@ -60,7 +101,7 @@ class PrototypeKitReleaseUrlResolverSpec extends FunSpec with WireMockEndpoints 
         method = GET,
         url = "/releases/latest",
         extraHeaders = Map("content-type" -> "application/json"),
-        willRespondWith = (404, Some("THE ERROR FROM REMOTE")))
+        willRespondWith = (404, Some("THE ERROR FROM REMOTE"), Map.empty))
 
       PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl).left.value shouldBe s"HTTP error (404) while getting the release zip artifact from $endpointMockUrl/releases/latest: THE ERROR FROM REMOTE"
 
@@ -78,7 +119,7 @@ class PrototypeKitReleaseUrlResolverSpec extends FunSpec with WireMockEndpoints 
         method = GET,
         url = "/releases/latest",
         extraHeaders = Map("content-type" -> "application/json"),
-        willRespondWith = (200, Some(jsonReponse)))
+        willRespondWith = (200, Some(jsonReponse), Map.empty))
 
       PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl).left.value shouldBe s"'zipball_url' is not found in json response: ${Json.prettyPrint(Json.parse(jsonReponse))}"
 
@@ -89,7 +130,7 @@ class PrototypeKitReleaseUrlResolverSpec extends FunSpec with WireMockEndpoints 
                              method: RequestMethod,
                              url: String,
                              extraHeaders: Map[String, String] = Map(),
-                             willRespondWith: (Int, Option[String])): Unit = {
+                             willRespondWith: (Int, Option[String], Map[String, String])): Unit = {
 
     val builder = extraHeaders.foldLeft(new MappingBuilder(method, urlEqualTo(url))) { (acc, header) =>
       acc.withHeader(header._1, equalTo(header._2))
@@ -99,11 +140,15 @@ class PrototypeKitReleaseUrlResolverSpec extends FunSpec with WireMockEndpoints 
     val response: ResponseDefinitionBuilder = new ResponseDefinitionBuilder()
       .withStatus(willRespondWith._1)
 
-    val resp = willRespondWith._2.map { b =>
-      response.withBody(b)
+    val responseWithHeaders = willRespondWith._3.foldLeft(response) { (acc, header) =>
+      acc.withHeader(header._1, header._2)
+    }
+
+    val responseWithBody = willRespondWith._2.map { b =>
+      responseWithHeaders.withBody(b)
     }.getOrElse(response)
 
-    builder.willReturn(resp)
+    builder.willReturn(responseWithBody)
 
     endpointMock.register(builder)
   }
