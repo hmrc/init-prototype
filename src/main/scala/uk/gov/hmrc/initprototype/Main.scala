@@ -86,7 +86,7 @@ object Main {
 
 
   def start(config: Config): Unit = {
-    val credentials = GithubCredentials(config.credentialsFile)
+    val credentials = GithubCredentials(config.githubUsername, config.githubToken)
 
     val eitherErrorOrUrl: Either[ErrorMessage, ZipBallUrl] = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(config.templateRepoApiUrl)
 

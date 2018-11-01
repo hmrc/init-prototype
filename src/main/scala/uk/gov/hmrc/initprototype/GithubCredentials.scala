@@ -16,44 +16,4 @@
 
 package uk.gov.hmrc.initprototype
 
-import java.io.File
-import java.nio.file.Path
-
-import scala.io.Source
-
 case class GithubCredentials(user:String, token:String)
-
-object GithubCredentials {
-
-  def apply(credentialFile :String): GithubCredentials = {
-    val githubCredsOpt = findGithubCredsInFile(new File(credentialFile).toPath)
-    githubCredsOpt.getOrElse(throw new scala.IllegalArgumentException(s"Did not find valid Github credentials in $credentialFile"))
-  }
-
-  def findGithubCredsInFile(file:Path):Option[GithubCredentials] = {
-    val conf = new ConfigFile(file)
-
-    conf.get("token") map { t => GithubCredentials("token", t)}
-  }
-}
-
-
-
-class ConfigFile(file: Path) {
-
-  private val kvMap: Map[String, String] = {
-    try {
-      Source.fromFile(file.toFile)
-        .getLines().toSeq
-        .map(_.split("="))
-        .map { case Array(key, value) => key.trim -> value.trim}.toMap
-    } catch {
-      case e: Exception => {
-        println(s"error parsing $file ${e.getMessage}")
-        Map.empty
-      }
-    }
-  }
-
-  def get(path: String) = kvMap.get(path)
-}

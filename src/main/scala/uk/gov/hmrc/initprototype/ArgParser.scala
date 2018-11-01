@@ -18,11 +18,10 @@ package uk.gov.hmrc.initprototype
 
 object ArgParser {
 
-
-
   val DEFAULT_BOOTSTRAP_TAG = "0.1.0"
 
-  case class Config(credentialsFile: String = "",
+  case class Config(githubUsername: String = "",
+                    githubToken: String = "",
                     templateRepoApiUrl: String = "",
                     targetGithubHost: String = "",
                     targetOrg: String = "",
@@ -40,9 +39,13 @@ object ArgParser {
 
     help("help") text "prints this usage text"
 
-    opt[String]("cred-file") action { (x, c) =>
-      c.copy(credentialsFile = x)
-    } text "github credentials file path"
+    opt[String]("github-username") action { (x, c) =>
+      c.copy(githubUsername = x)
+    } text "github username"
+
+    opt[String]("github-token") action { (x, c) =>
+      c.copy(githubToken = x)
+    } text "github token"
 
     opt[String]("target-github-host") action { (x, c) =>
       c.copy(targetGithubHost = x)
