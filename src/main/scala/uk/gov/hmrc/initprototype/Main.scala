@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,7 @@ import scala.util.{Failure, Success, Try}
 
 object Main {
 
-
   val logger = com.typesafe.scalalogging.Logger("init-prototype")
-
 
   def main(args: Array[String]) {
 
@@ -49,11 +47,10 @@ object Main {
     }
   }
 
-
-
   def gitClone(localRepoPath: String, config: Config, token: String) = {
 
-    val repoUrl = s"https://$token:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
+    val repoUrl =
+      s"https://$token:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
 
     logger.debug(s"Cloning to: $localRepoPath")
     val dir = Path(localRepoPath)
@@ -61,14 +58,14 @@ object Main {
     val repoPath = new File(localRepoPath).toPath.resolve(config.targetRepoName).toString
     %('rm, "-rf", repoPath)(dir)
 
-    %('git, "clone" , repoUrl)(dir)
+    %('git, "clone", repoUrl)(dir)
   }
 
   def gitPush(localRepoPath: String, config: Config) = {
 
     val dir = Path(localRepoPath)
     %('git, "add", ".", "-A")(dir)
-    %('git, "commit" , "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
+    %('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
 
     logger.debug(s"Pushing: $localRepoPath")
     // we use Try to protect the token from being printed on the console in case of an error
@@ -84,11 +81,11 @@ object Main {
 
   }
 
-
   def start(config: Config): Unit = {
     val credentials = GithubCredentials(config.githubUsername, config.githubToken)
 
-    val eitherErrorOrUrl: Either[ErrorMessage, ZipBallUrl] = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(config.templateRepoApiUrl)
+    val eitherErrorOrUrl: Either[ErrorMessage, ZipBallUrl] =
+      PrototypeKitReleaseUrlResolver.getLatestZipballUrl(config.templateRepoApiUrl, Some(config.githubToken))
 
     eitherErrorOrUrl match {
       case Left(e) =>
@@ -97,8 +94,8 @@ object Main {
         val tempPath = FileUtils.getTempDirectory.toPath
         gitClone(tempPath.toString, config, credentials.token)
         val artifactDownloadPath = tempPath.resolve("prototype-template-archive.zip").toString
-        val localExplodedPath = new GithubArtifactDownloader().getRepoZipAndExplode(githubZipUrl, artifactDownloadPath)
-        val localRepoPath = new File(tempPath.toString).toPath.resolve(config.targetRepoName)
+        val localExplodedPath    = new GithubArtifactDownloader().getRepoZipAndExplode(githubZipUrl, artifactDownloadPath)
+        val localRepoPath        = new File(tempPath.toString).toPath.resolve(config.targetRepoName)
         FileUtils.copyDirectory(new File(localExplodedPath), localRepoPath.toFile)
         gitPush(localRepoPath.toString, config)
     }

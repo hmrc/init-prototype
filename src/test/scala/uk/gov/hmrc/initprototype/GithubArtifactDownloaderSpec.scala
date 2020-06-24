@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,36 +19,36 @@ package uk.gov.hmrc.initprototype
 import java.io.{File, FileInputStream}
 
 import ammonite.ops._
-import com.github.tomakehurst.wiremock.client.WireMock.{equalTo, urlEqualTo}
-import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitionBuilder}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod._
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 import org.zeroturnaround.zip.ZipUtil
 
-class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with Matchers {
+class GithubArtifactDownloaderSpec extends AnyFunSpec with WireMockEndpoints with Matchers {
 
   type FilePath = String
   private val tempDirectoryPath = FileUtils.getTempDirectory
-  val githubArtifactDownloader = new GithubArtifactDownloader()
+  val githubArtifactDownloader  = new GithubArtifactDownloader()
 
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
-      val token = "token123"
-      val url = s"$endpointMockUrl/xyz"
-
-      
+      val url   = s"$endpointMockUrl/xyz"
 
       givenGitHubExpects(
         method = GET,
-        url = "/xyz",
+        url    = "/xyz",
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
-        willRespondWithFileContents = (200, Some(zipContentsOfDir(getClass.getClassLoader.getResource("test-dir").getPath))))
+        willRespondWithFileContents =
+          (200, Some(zipContentsOfDir(getClass.getClassLoader.getResource("test-dir").getPath)))
+      )
 
-      val explodedPath = githubArtifactDownloader.getRepoZipAndExplode(url, tempDirectoryPath.toPath.resolve("some-archive.zip").toString)
+      val explodedPath = githubArtifactDownloader
+        .getRepoZipAndExplode(url, tempDirectoryPath.toPath.resolve("some-archive.zip").toString)
 
       explodedPath shouldBe tempDirectoryPath.toPath.resolve("some-archive.zip/foo").toString
       val lsResult = %%('ls)(Path(explodedPath))
@@ -57,24 +57,25 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
   }
 
   def givenGitHubExpects[T](
-                             method: RequestMethod,
-                             url: String,
-                             extraHeaders: Map[String, String] = Map(),
-                             willRespondWithFileContents: (Int, Option[FilePath])): Unit = {
-
-    val builder = extraHeaders.foldLeft(new MappingBuilder(method, urlEqualTo(url))) { (acc, header) =>
+    method: RequestMethod,
+    url: String,
+    extraHeaders: Map[String, String] = Map(),
+    willRespondWithFileContents: (Int, Option[FilePath])): Unit = {
+    val builder = extraHeaders.foldLeft(request(method.toString, urlEqualTo(url))) { (acc, header) =>
       acc.withHeader(header._1, equalTo(header._2))
     }
 
     val fileContents =
       willRespondWithFileContents._2.map(file => IOUtils.toByteArray(new FileInputStream(file)))
 
-    val response: ResponseDefinitionBuilder = new ResponseDefinitionBuilder()
+    val response = aResponse()
       .withStatus(willRespondWithFileContents._1)
 
-    val resp = fileContents.map { b =>
-      response.withBody(b)
-    }.getOrElse(response)
+    val resp = fileContents
+      .map { b =>
+        response.withBody(b)
+      }
+      .getOrElse(response)
 
     builder.willReturn(resp)
 
@@ -86,6 +87,5 @@ class GithubArtifactDownloaderSpec extends FunSpec with WireMockEndpoints with M
     ZipUtil.pack(new File(path), new File(zipFilepath))
     zipFilepath
   }
-
 
 }

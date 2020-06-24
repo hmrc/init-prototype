@@ -7,6 +7,7 @@ object AssemblySettings {
   def apply()= Seq(
     assemblyJarName in assembly := "init-prototype.jar",
     assemblyMergeStrategy in assembly := {
+      case "module-info.class" => MergeStrategy.discard
       case PathList("org", "apache", "commons", "logging", xs@_*) => MergeStrategy.first
       case PathList("play", "core", "server", xs@_*) => MergeStrategy.first
       case x =>
@@ -15,7 +16,7 @@ object AssemblySettings {
     },
     artifact in(Compile, assembly) := {
       val art = (artifact in(Compile, assembly)).value
-      art.copy(`classifier` = Some("assembly"))
+      art.withClassifier(Some("assembly"))
     }
   )
 }
