@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ object ArgParser {
 
   val DEFAULT_BOOTSTRAP_TAG = "0.1.0"
 
-  case class Config(githubUsername: String = "",
-                    githubToken: String = "",
-                    templateRepoApiUrl: String = "",
-                    targetGithubHost: String = "",
-                    targetOrg: String = "",
-                    targetRepoName: String = "",
-                    verbose: Boolean = false)
-
+  case class Config(
+    githubUsername: String     = "",
+    githubToken: String        = "",
+    templateRepoApiUrl: String = "",
+    targetGithubHost: String   = "",
+    targetOrg: String          = "",
+    targetRepoName: String     = "",
+    verbose: Boolean           = false)
 
   val currentVersion = Option(getClass.getPackage.getImplementationVersion).getOrElse("(version not found)")
 

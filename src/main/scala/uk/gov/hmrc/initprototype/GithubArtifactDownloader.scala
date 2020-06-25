@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.FileFilterUtils
 import org.zeroturnaround.zip.ZipUtil
 import uk.gov.hmrc.initprototype.Main.logger
-
-import scala.language.postfixOps
 import scalaj.http.{Http, HttpOptions, HttpResponse}
 
 class GithubArtifactDownloader() {
@@ -41,9 +39,8 @@ class GithubArtifactDownloader() {
     getExplodedRootPath(artifactDownloadPath)
   }
 
-
   private def getExplodedRootPath(artifactDownloadPath: String) = {
-    val file = new File(artifactDownloadPath)
+    val file      = new File(artifactDownloadPath)
     val listFiles = file.listFiles(FileFilterUtils.directoryFileFilter().asInstanceOf[FileFilter])
     logger.debug("Dirs found:")
     logger.debug(listFiles.toList.mkString("\n"))
@@ -52,18 +49,18 @@ class GithubArtifactDownloader() {
     s"${listFiles.head}"
   }
 
-
   private def getZipBallFromGithub(githubZipUri: String, artifactDownloadPath: String) = {
     logger.debug(s"Getting code archive from: $githubZipUri")
 
     val bs: HttpResponse[Array[Byte]] = Http(githubZipUri)
-      .header("content-type" , "application/json")
+      .header("content-type", "application/json")
       .option(HttpOptions.followRedirects(true))
       .asBytes
 
     logger.debug(s"Response code: ${bs.code}")
     if (bs.isError) {
-      logger.error(s"Looks like we have encountered an error downloading the zip file from github:\n${new String(bs.body)}")
+      logger.error(
+        s"Looks like we have encountered an error downloading the zip file from github:\n${new String(bs.body)}")
       System.exit(-1)
     }
     logger.debug(s"Got ${bs.body.length} bytes from $githubZipUri... saving it to $artifactDownloadPath")
@@ -73,8 +70,5 @@ class GithubArtifactDownloader() {
     FileUtils.writeByteArrayToFile(file, bs.body)
     logger.debug(s"Saved file: $artifactDownloadPath")
   }
-
-
-
 
 }

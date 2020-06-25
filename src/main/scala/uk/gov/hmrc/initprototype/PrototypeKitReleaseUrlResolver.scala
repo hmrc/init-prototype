@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2020 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,28 +21,35 @@ import scalaj.http.{Http, HttpOptions, HttpResponse}
 
 object PrototypeKitReleaseUrlResolver {
 
-
-  type ZipBallUrl = String
+  type ZipBallUrl   = String
   type ErrorMessage = String
 
-  def getLatestZipballUrl(repoApiUrl: String): Either [ErrorMessage , ZipBallUrl] = {
+  def getLatestZipballUrl(repoApiUrl: String, token: Option[String] = None): Either[ErrorMessage, ZipBallUrl] = {
     require(!repoApiUrl.endsWith("/"), s"repository api url should not end '/': $repoApiUrl")
 
     val latestReleaseUrl = s"$repoApiUrl/releases/latest"
-    val response: HttpResponse[String] = Http(latestReleaseUrl).header("content-type" , "application/json")
+
+    val headers = Seq(
+      "content-type" -> "application/json"
+    ) ++ token.map(token => "Authorization" -> s"token $token")
+
+    val response: HttpResponse[String] = Http(latestReleaseUrl)
+      .headers(headers)
       .option(HttpOptions.followRedirects(true))
       .asString
 
     val responseBody = response.body
-    if(response.isNotError) {
+    if (response.isNotError) {
 
       val jsonFieldName = "zipball_url"
       (Json.parse(responseBody) \ jsonFieldName).asOpt[String] match {
         case Some(v) => Right(v)
-        case None => Left(s"'$jsonFieldName' is not found in json response: ${Json.prettyPrint(Json.parse(responseBody))}")
+        case None =>
+          Left(s"'$jsonFieldName' is not found in json response: ${Json.prettyPrint(Json.parse(responseBody))}")
       }
     } else {
-      Left(s"HTTP error (${response.code}) while getting the release zip artifact from $latestReleaseUrl: $responseBody")
+      Left(
+        s"HTTP error (${response.code}) while getting the release zip artifact from $latestReleaseUrl: $responseBody")
     }
   }
 }
