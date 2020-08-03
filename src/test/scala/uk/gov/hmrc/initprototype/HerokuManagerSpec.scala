@@ -16,25 +16,23 @@
 
 package uk.gov.hmrc.initprototype
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.github.tomakehurst.wiremock.client.WireMock.{getRequestedFor, patchRequestedFor, urlEqualTo}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.{JsObject, JsValue}
 
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
-class HerokuManagerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
-  private val port           = 8080
-  private val wireMockServer = new WireMockServer(options().port(port))
-
-  implicit val ec: ExecutionContext = ExecutionContext.global
+class HerokuManagerSpec
+    extends AnyFunSpec
+    with BeforeAndAfterEach
+    with Matchers
+    with WireMockEndpoints
+    with AwaitSupport {
   implicit val config: HerokuConfiguration = new HerokuConfiguration {
-    override val apiToken = "dummy-token"
-    override val baseUrl  = s"http://localhost:$port"
+    override val baseUrl: String = endpointMockUrl
   }
 
   describe("HerokuManager") {
@@ -42,171 +40,152 @@ class HerokuManagerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers
 
     describe("getApps") {
       it("should get all the apps") {
-        val apps = Await.result(herokuManager.getApps, 1 second)
+        val apps: Seq[HerokuApp] = await(herokuManager.getApps)
 
-        (apps.size)                   should be > 1
-        (apps(0) \ "name").as[String] should equal("my-app")
-        (apps(1) \ "name").as[String] should equal("my-other-app")
+        apps.size      should be > 1
+        apps.head.name should equal("my-app")
+        apps(1).name   should equal("my-other-app")
       }
 
       it("should throw an error if the server responds with a 401") {
         val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
-          override val apiToken = "incorrect-token"
-          override val baseUrl  = s"http://localhost:$port"
+          override val apiToken        = "incorrect-token"
+          override val baseUrl: String = endpointMockUrl
         }
         val otherHerokuManager = new HerokuManager()(incorrectConfig, implicitly[ExecutionContext])
 
         val thrown = intercept[Exception] {
-          Await.result(otherHerokuManager.getApps, 1000 millis)
+          await(otherHerokuManager.getApps)
         }
 
         thrown.getMessage should startWith regex "Error with Heroku request"
       }
 
       it("should call the Heroku api") {
-        Await.result(herokuManager.getApps, 1000 millis)
+        await(herokuManager.getApps)
 
-        wireMockServer.verify(getRequestedFor(urlEqualTo("/apps/")))
+        endpointServer.verify(getRequestedFor(urlEqualTo("/apps/")))
       }
     }
 
     describe("getAppNames") {
       it("should get all the apps") {
-        val apps = Await.result(herokuManager.getAppNames, 1 second)
+        val apps = await(herokuManager.getAppNames)
 
-        (apps.size) should be(2)
-        apps(0)     should equal("my-app")
-        apps(1)     should equal("my-other-app")
+        apps.size should be(2)
+        apps.head should equal("my-app")
+        apps(1)   should equal("my-other-app")
       }
     }
 
     describe("getAppReleases") {
       it("should get the releases for the given app") {
-        val (releases: Seq[JsObject], _) = Await.result(herokuManager.getAppReleases("any-app"), 1 second)
+        val (releases: Seq[HerokuRelease], _) = await(herokuManager.getAppReleases("any-app"))
 
-        (releases.size)                          should be > 0
-        (releases(0) \ "description").as[String] should equal("Initial release")
+        releases.size             should be > 0
+        releases.head.description should equal("Initial release")
       }
 
       it("should get the next page of releases for the given app") {
-        val (releases: Seq[JsObject], _) =
-          Await.result(herokuManager.getAppReleases("any-app", Some("version ]200..")), 1 second)
+        val (releases: Seq[HerokuRelease], _) =
+          await(herokuManager.getAppReleases("any-app", Some("version ]200..")))
 
-        (releases.size)                          should be > 0
-        (releases(0) \ "description").as[String] should equal("Third release")
+        releases.size             should be > 0
+        releases.head.description should equal("Third release")
       }
 
       it("should return the correct next range token") {
-        val (releases: Seq[JsObject], nextRange) = Await.result(herokuManager.getAppReleases("any-app"), 1 second)
+        val (releases: Seq[HerokuRelease], nextRange) = await(herokuManager.getAppReleases("any-app"))
 
-        (releases.size) should be > 0
-        nextRange       should equal(Some("version ]200.."))
+        releases.size should be > 0
+        nextRange     should equal(Some("version ]200.."))
       }
 
       it("should throw an error if the server responds with a 401") {
         val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
-          override val apiToken = "incorrect-token"
-          override val baseUrl  = s"http://localhost:$port"
+          override val apiToken        = "incorrect-token"
+          override val baseUrl: String = endpointMockUrl
         }
         val otherHerokuManager = new HerokuManager()(incorrectConfig, implicitly[ExecutionContext])
 
         val thrown = intercept[Exception] {
-          Await.result(otherHerokuManager.getAppReleases("my-sample-app"), 1000 millis)
+          await(otherHerokuManager.getAppReleases("my-sample-app"))
         }
 
         thrown.getMessage should startWith regex "Error with Heroku request"
       }
 
       it("should call the Heroku api") {
-        Await.result(herokuManager.getAppReleases("my-other-app"), 1000 millis)
+        await(herokuManager.getAppReleases("my-other-app"))
 
-        wireMockServer.verify(getRequestedFor(urlEqualTo("/apps/my-other-app/releases/")))
+        endpointServer.verify(getRequestedFor(urlEqualTo("/apps/my-other-app/releases/")))
       }
     }
 
     describe("getAppFormation") {
       it("should get the formation for the given app") {
-        val formation: Option[JsObject] = Await.result(herokuManager.getAppFormation("any-app"), 1 second)
+        val formation: Option[HerokuFormation] = await(herokuManager.getAppFormation("any-app"))
 
-        (formation.isDefined)               should be(true)
-        (formation.get \ "size").as[String] should equal("Standard-1X")
+        formation.isDefined should be(true)
+        formation.get.size  should equal("Standard-1X")
       }
 
       it("should throw an error if the server responds with a 401") {
         val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
-          override val apiToken = "incorrect-token"
-          override val baseUrl  = s"http://localhost:$port"
+          override val apiToken        = "incorrect-token"
+          override val baseUrl: String = endpointMockUrl
         }
         val otherHerokuManager = new HerokuManager()(incorrectConfig, implicitly[ExecutionContext])
 
         val thrown = intercept[Exception] {
-          Await.result(otherHerokuManager.getAppFormation("my-sample-app"), 1000 millis)
+          await(otherHerokuManager.getAppFormation("my-sample-app"))
         }
 
         thrown.getMessage should startWith regex "Error with Heroku request"
       }
 
       it("should call the Heroku api") {
-        Await.result(herokuManager.getAppFormation("my-other-app"), 1000 millis)
+        await(herokuManager.getAppFormation("my-other-app"))
 
-        wireMockServer.verify(getRequestedFor(urlEqualTo("/apps/my-other-app/formation/")))
-      }
-    }
-
-    describe("getAppQuantityAndSize") {
-      it("should get the quantity and size for the given app") {
-        val tupleOption = Await.result(herokuManager.getAppQuantityAndSize("any-app"), 1 second)
-
-        tupleOption.isDefined should be(true)
-        val (quantity, size) = tupleOption.get
-        size     should be("Standard-1X")
-        quantity should be(1)
+        endpointServer.verify(getRequestedFor(urlEqualTo("/apps/my-other-app/formation/")))
       }
     }
 
     describe("getAppReleasesRecursive") {
       it("should get all the releases for the given app") {
-        val (releases, _) = Await.result(herokuManager.getAppReleasesRecursive("any-app"), 10 second)
+        val (releases, _) = await(herokuManager.getAppReleasesRecursive("any-app"), 10 second)
 
-        (releases.size)                          should be(4)
-        (releases(0) \ "description").as[String] should equal("Initial release")
-        (releases(3) \ "description").as[String] should equal("Fourth release")
+        releases.size             should be(4)
+        releases.head.description should equal("Initial release")
+        releases(3).description   should equal("Fourth release")
       }
     }
 
     describe("spinDown") {
       it("should set the dyno count of the given app to zero") {
-        val app: JsValue = Await.result(herokuManager.spinDownApp("my-sample-app"), 1000 millis)
+        val app: HerokuFormation = await(herokuManager.spinDownApp("my-sample-app"))
 
-        (app \ "quantity").as[Int]        should equal(0)
-        (app \ "app" \ "name").as[String] should equal("my-test-app")
+        app.quantity should equal(0)
+        app.app.name should equal("my-test-app")
       }
 
       it("should throw an error if the server responds with a 401") {
         val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
-          override val apiToken = "incorrect-token"
-          override val baseUrl  = s"http://localhost:$port"
+          override val apiToken        = "incorrect-token"
+          override val baseUrl: String = endpointMockUrl
         }
         val otherHerokuManager = new HerokuManager()(incorrectConfig, implicitly[ExecutionContext])
 
         intercept[Exception] {
-          Await.result(otherHerokuManager.spinDownApp("my-sample-app"), 1000 millis)
+          await(otherHerokuManager.spinDownApp("my-sample-app"))
         }
       }
 
       it("should call the Heroku api") {
-        Await.result(herokuManager.spinDownApp("my-other-app"), 1000 millis)
+        await(herokuManager.spinDownApp("my-other-app"))
 
-        wireMockServer.verify(patchRequestedFor(urlEqualTo("/apps/my-other-app/formation/web")))
+        endpointServer.verify(patchRequestedFor(urlEqualTo("/apps/my-other-app/formation/web")))
       }
     }
-  }
-
-  override def beforeEach {
-    wireMockServer.start()
-  }
-
-  override def afterEach {
-    wireMockServer.stop()
   }
 }

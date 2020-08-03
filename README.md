@@ -21,11 +21,11 @@ in Heroku. The report lists the prototypes, their sizes, when they were first cr
 To run this task, having cloned the repository and changed to the repository root directory,
 
 ```shell script
-sbt -Dheroku.apiToken=REPLACE_WITH_TOKEN generateHerokuReport
+sbt -Dheroku.apiToken=REPLACE_WITH_TOKEN "generateHerokuReport report.txt"
 ```
 
-This generates a tab-separated text file in the console standard output
-that can be copied into a spreadsheet.
+This generates a tab-separated plain text file, report.txt, in the repository root directory that can
+be imported into a spreadsheet for manipulation.
 
 ## Spinning down Heroku prototypes
 

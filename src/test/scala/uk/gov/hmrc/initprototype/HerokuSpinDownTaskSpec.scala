@@ -18,30 +18,35 @@ package uk.gov.hmrc.initprototype
 
 import java.io.PrintWriter
 
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-import play.api.libs.json.JsArray
 import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
+import org.scalatest.BeforeAndAfterEach
 
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration._
+import scala.concurrent.Future
 
-class HerokuTaskSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers with MockitoSugar {
-  implicit val ec: ExecutionContext        = ExecutionContext.global
+class HerokuSpinDownTaskSpec
+    extends AnyFunSpec
+    with Matchers
+    with MockitoSugar
+    with AwaitSupport
+    with BeforeAndAfterEach {
   implicit val config: HerokuConfiguration = mock[HerokuConfiguration]
   implicit val mockManager: HerokuManager  = mock[HerokuManager]
 
-  describe("HerokuTask") {
-    val herokuTask = new HerokuTask
+  override def beforeEach: Unit = reset(mockManager)
+
+  describe("HerokuSpinDownTask") {
+    val herokuTask = new HerokuSpinDownTask
 
     describe("spinDownApps") {
       it("should set the dyno count of the given app to zero") {
-        when(mockManager.spinDownApp(anyString())).thenReturn(Future.successful(JsArray(Seq.empty)))
+        when(mockManager.spinDownApp(anyString()))
+          .thenReturn(Future.successful(HerokuFormation("Standard-1X", 0, HerokuApp("my-app"))))
 
-        Await.result(herokuTask.spinDownApps(Seq("my-test-app", "my-other-app")), 1000 millis)
+        await(herokuTask.spinDownApps(Seq("my-test-app", "my-other-app")))
 
         verify(mockManager).spinDownApp("my-other-app")
         verify(mockManager).spinDownApp("my-test-app")
@@ -66,9 +71,23 @@ class HerokuTaskSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers wi
 
       it("should read from a file") {
         val appsFile = createAppsFile(Seq("app-one", "app-two"))
-        when(mockManager.spinDownApp(anyString())).thenReturn(Future.successful(JsArray(Seq.empty)))
+        when(mockManager.spinDownApp(anyString()))
+          .thenReturn(Future.successful(HerokuFormation("Standard-1X", 0, HerokuApp("my-app"))))
 
-        Await.result(herokuTask.spinDownApps(appsFile), 1000 millis)
+        await(herokuTask.spinDownAppsFromFile(appsFile))
+
+        verify(mockManager).spinDownApp("app-one")
+        verify(mockManager).spinDownApp("app-two")
+      }
+
+      it("should read from multiple files") {
+        val appsFileOne = createAppsFile(Seq("app-one"))
+        val appsFileTwo = createAppsFile(Seq("app-two"))
+
+        when(mockManager.spinDownApp(anyString()))
+          .thenReturn(Future.successful(HerokuFormation("Standard-1X", 0, HerokuApp("my-app"))))
+
+        await(herokuTask.spinDownAppsFromFiles(Seq(appsFileOne, appsFileTwo)))
 
         verify(mockManager).spinDownApp("app-one")
         verify(mockManager).spinDownApp("app-two")

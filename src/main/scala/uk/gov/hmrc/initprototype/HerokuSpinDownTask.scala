@@ -16,38 +16,34 @@
 
 package uk.gov.hmrc.initprototype
 
-import play.api.libs.json.JsValue
-
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.Source
-import scala.concurrent.duration._
 
-class HerokuTask(
-  implicit herokuManager: HerokuManager,
-  herokuConfiguration: HerokuConfiguration,
-  ec: ExecutionContext) {
+class HerokuSpinDownTask(implicit herokuManager: HerokuManager, ec: ExecutionContext) {
 
-  def spinDownApps(apps: Seq[String]): Future[Seq[JsValue]] = Future.sequence(
+  def spinDownApps(apps: Seq[String]): Future[Seq[HerokuFormation]] = Future.sequence(
     apps.map(herokuManager.spinDownApp)
   )
 
-  def spinDownApps(appsFile: String): Future[Seq[JsValue]] = {
+  def spinDownAppsFromFile(appsFile: String): Future[Seq[HerokuFormation]] = {
     val apps = Source.fromFile(appsFile, "UTF-8")
     try {
-      spinDownApps(apps.getLines.toArray)
+      spinDownApps(apps.getLines.toSeq)
     } finally {
       apps.close()
     }
   }
+
+  def spinDownAppsFromFiles(appsFiles: Seq[String]): Future[Seq[Seq[HerokuFormation]]] = Future.sequence(
+    appsFiles.map(spinDownAppsFromFile)
+  )
 }
 
-object HerokuTask extends App {
+object HerokuSpinDownTask extends App {
   implicit val ec: ExecutionContext                     = ExecutionContext.global
   implicit val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration
   implicit val herokuManager: HerokuManager             = new HerokuManager
+  val herokuTask                                        = new HerokuSpinDownTask
 
-  val herokuTask = new HerokuTask
-
-  val futures: Seq[Future[Seq[JsValue]]] = args.map(herokuTask.spinDownApps)
-  Await.result(Future.sequence(futures), 60 seconds)
+  Await.result(herokuTask.spinDownAppsFromFiles(args), herokuConfiguration.timeout)
 }

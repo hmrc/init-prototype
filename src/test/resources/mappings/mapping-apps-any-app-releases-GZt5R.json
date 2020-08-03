@@ -6,6 +6,9 @@
     "headers" : {
       "Authorization" : {
         "equalTo" : "Bearer dummy-token"
+      },
+      "Range" : {
+        "equalTo" : ";max=1000;"
       }
     }
   },

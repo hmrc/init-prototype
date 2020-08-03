@@ -15,15 +15,14 @@
  */
 
 package uk.gov.hmrc.initprototype
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
-import com.typesafe.config.{Config, ConfigFactory}
-import scala.concurrent.duration.{Duration, MILLISECONDS}
+case class HerokuRelease(createdAt: String, description: String)
 
-class HerokuConfiguration {
-  private val config: Config = ConfigFactory.load()
-  val baseUrl: String        = config.getString("heroku.baseUrl")
-  val apiToken: String       = config.getString("heroku.apiToken")
-  val timeout: Duration      = Duration(config.getInt("heroku.timeoutMs"), MILLISECONDS)
-  val connTimeoutMs: Int     = config.getInt("heroku.connTimeoutMs")
-  val readTimeoutMs: Int     = config.getInt("heroku.readTimeoutMs")
+object HerokuRelease {
+  implicit val herokuReleaseReads: Reads[HerokuRelease] = (
+    (JsPath \ "created_at").read[String] and
+      (JsPath \ "description").read[String]
+  )(HerokuRelease.apply _)
 }

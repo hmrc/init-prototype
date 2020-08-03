@@ -1,0 +1,22 @@
+{
+  "id" : "016ce50e-db66-3ff6-9fd7-d39186856b12",
+  "request" : {
+    "urlPattern" : "/apps/([a-z\\-]*)/formation/",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer incorrect-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 401,
+    "bodyFileName" : "body-apps-test-app-error.json",
+    "headers" : {
+      "Cache-Control" : "private, no-cache",
+      "Content-Type" : "application/json",
+      "Vary" : "Authorization,Accept-Encoding"
+    }
+  },
+  "uuid" : "016ce50e-db66-3ff6-9fd7-d39186856b12"
+}

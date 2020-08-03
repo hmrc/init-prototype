@@ -1,0 +1,22 @@
+{
+  "id": "69f6dba1-a43a-361f-b686-2fe75a54e750",
+  "request": {
+    "url": "/apps/",
+    "method": "GET",
+    "headers": {
+      "Authorization": {
+        "equalTo": "Bearer incorrect-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 401,
+    "bodyFileName" : "body-apps-test-app-error.json",
+    "headers" : {
+      "Cache-Control" : "private, no-cache",
+      "Content-Type" : "application/json",
+      "Vary" : "Authorization,Accept-Encoding"
+    }
+  },
+  "uuid": "69f6dba1-a43a-361f-b686-2fe75a54e750"
+}

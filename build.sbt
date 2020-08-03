@@ -6,6 +6,7 @@ lazy val InitPrototype = Project(libName, file("."))
     majorVersion := 0,
     makePublicallyAvailableOnBintray := true,
     scalaVersion := "2.12.10",
+    scalacOptions += "-deprecation",
     libraryDependencies ++= LibDependencies.compile ++ LibDependencies.test,
     resolvers += Resolver.typesafeRepo("releases"),
     AssemblySettings(),
@@ -14,7 +15,7 @@ lazy val InitPrototype = Project(libName, file("."))
 )
 
 val spinDownHerokuApps = inputKey[Unit]("Spin down the heroku apps listed in the given file.")
-fullRunInputTask(spinDownHerokuApps, Compile, "uk.gov.hmrc.initprototype.HerokuTask")
+fullRunInputTask(spinDownHerokuApps, Compile, "uk.gov.hmrc.initprototype.HerokuSpinDownTask")
 
-val generateHerokuReport = taskKey[Unit]("Generate a usage report from Heroku.")
-fullRunTask(generateHerokuReport, Compile, "uk.gov.hmrc.initprototype.HerokuReport")
+val generateHerokuReport = inputKey[Unit]("Generate a usage report from Heroku.")
+fullRunInputTask(generateHerokuReport, Compile, "uk.gov.hmrc.initprototype.HerokuReportTask")
