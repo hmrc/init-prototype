@@ -15,12 +15,12 @@
  */
 
 package uk.gov.hmrc.initprototype
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 import scalaj.http.{Http, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future, blocking}
 
-class HerokuManager(implicit config: HerokuConfiguration, ec: ExecutionContext) {
+class HerokuManager(config: HerokuConfiguration)(implicit ec: ExecutionContext) {
   import config._
 
   private val requestHeaders = Map(
@@ -33,35 +33,36 @@ class HerokuManager(implicit config: HerokuConfiguration, ec: ExecutionContext) 
     url: String,
     method: String                         = "GET",
     body: Option[String]                   = None,
-    additionalHeaders: Map[String, String] = Map.empty) =
-    blocking {
-      println(s"Starting Heroku request: $url")
+    additionalHeaders: Map[String, String] = Map.empty): Future[(String, Int, Map[String, IndexedSeq[String]])] =
+    Future {
+      blocking {
+        println(s"Starting Heroku request: $url")
 
-      val http = Http(s"$baseUrl$url")
-        .timeout(connTimeoutMs, readTimeoutMs)
-        .headers(requestHeaders ++ additionalHeaders)
-      val httpWithBody = if (body.isDefined) {
-        http.postData(body.get)
-      } else {
-        http
+        val http = Http(s"$baseUrl$url")
+          .timeout(connTimeoutMs, readTimeoutMs)
+          .headers(requestHeaders ++ additionalHeaders)
+        val httpWithBody = if (body.isDefined) {
+          http.postData(body.get)
+        } else {
+          http
+        }
+
+        val HttpResponse(responseBody, code, headers) = httpWithBody
+          .method(method)
+          .asString
+        if (code < 200 || code > 299) {
+          throw new Exception(s"Error with Heroku request $url: $responseBody")
+        }
+
+        println(s"Finished Heroku request: $url")
+
+        (responseBody, code, headers)
       }
-
-      val HttpResponse(responseBody, code, headers) = httpWithBody
-        .method(method)
-        .asString
-      if (code < 200 || code > 299) {
-        throw new Exception(s"Error with Heroku request $url: $responseBody")
-      }
-
-      println(s"Finished Heroku request: $url")
-
-      (responseBody, code, headers)
     }
 
-  def getApps: Future[Seq[HerokuApp]] = Future {
-    val (responseBody, _, _) = herokuRequest("/apps/")
-
-    Json.parse(responseBody).as[Seq[HerokuApp]]
+  private def getApps: Future[Seq[HerokuApp]] = herokuRequest("/apps/") map {
+    case (responseBody: String, _, _) =>
+      Json.parse(responseBody).as[Seq[HerokuApp]]
   }
 
   def getAppNames: Future[Seq[String]] = getApps.map { apps =>
@@ -69,51 +70,54 @@ class HerokuManager(implicit config: HerokuConfiguration, ec: ExecutionContext) 
     appNames.sorted
   }
 
-  def getAppReleases(app: String, range: Option[String] = None): Future[(Seq[HerokuRelease], Option[String])] = Future {
+  def getAppReleasesFromRange(app: String, range: Option[String]): Future[(Seq[HerokuRelease], Option[String])] = {
     val url         = s"/apps/$app/releases/"
     val rangeHeader = Map("Range" -> range.getOrElse(";max=1000;"))
 
-    val (body, _, headers) = herokuRequest(url, additionalHeaders = rangeHeader)
-    val parsed             = Json.parse(body).validate[Seq[HerokuRelease]]
-    if (parsed.isError) {
-      throw new Exception(s"Error fetching releases for $app with $body")
+    herokuRequest(url, additionalHeaders = rangeHeader) flatMap {
+      case (body, _, headers) =>
+        Json.parse(body).validate[Seq[HerokuRelease]] match {
+          case JsSuccess(releases, _) =>
+            val nextRange: Option[String] = headers.get("next-range").flatMap(_.headOption)
+
+            Future.successful((releases, nextRange))
+          case _ =>
+            Future.failed(throw new Exception(s"Error fetching releases for $app with $body"))
+        }
     }
-
-    val releases                  = parsed.get
-    val nextRange: Option[String] = headers.get("next-range").flatMap(_.headOption)
-
-    (releases, nextRange)
   }
 
-  def getAppReleasesRecursive(
+  def getAppReleases(
     appName: String,
     accumulator: Seq[HerokuRelease] = Seq.empty,
-    range: Option[String]      = None): Future[(Seq[HerokuRelease], Option[String])] =
-    getAppReleases(appName, range).flatMap {
+    range: Option[String]): Future[(Seq[HerokuRelease], Option[String])] =
+    getAppReleasesFromRange(appName, range).flatMap {
       case (releases: Seq[HerokuRelease], nextRange: Option[String]) =>
         val combinedReleases = accumulator ++ releases
 
         if (nextRange.isEmpty) {
           Future.successful((combinedReleases, nextRange))
         } else {
-          getAppReleasesRecursive(appName, combinedReleases, nextRange)
+          getAppReleases(appName, combinedReleases, nextRange)
         }
     }
 
-  def getAppFormation(app: String): Future[Option[HerokuFormation]] = Future {
+  def getAppFormation(app: String): Future[Option[HerokuFormation]] = {
     val url = s"/apps/$app/formation/"
 
-    val (body, _, _) = herokuRequest(url)
-
-    Json.parse(body).as[Seq[HerokuFormation]].headOption
+    herokuRequest(url) map {
+      case (body, _, _) =>
+        Json.parse(body).as[Seq[HerokuFormation]].headOption
+    }
   }
 
-  def spinDownApp(app: String): Future[HerokuFormation] = Future {
+  def spinDownApp(app: String): Future[HerokuFormation] = {
     val url  = s"/apps/$app/formation/web"
     val body = Some("""{"quantity":0,"size":"Standard-1X","type":"web"}""")
 
-    val (responseBody, _, _) = herokuRequest(url, method = "PATCH", body)
-
-    Json.parse(responseBody).as[HerokuFormation]
+    herokuRequest(url, method = "PATCH", body) map {
+      case (responseBody, _, _) =>
+        Json.parse(responseBody).as[HerokuFormation]
+    }
   }
 }

@@ -33,13 +33,12 @@ class HerokuSpinDownTaskSpec
     with MockitoSugar
     with AwaitSupport
     with BeforeAndAfterEach {
-  implicit val config: HerokuConfiguration = mock[HerokuConfiguration]
-  implicit val mockManager: HerokuManager  = mock[HerokuManager]
+  val mockManager: HerokuManager = mock[HerokuManager]
 
   override def beforeEach: Unit = reset(mockManager)
 
   describe("HerokuSpinDownTask") {
-    val herokuTask = new HerokuSpinDownTask
+    val herokuTask = new HerokuSpinDownTask(mockManager)
 
     describe("spinDownApps") {
       it("should set the dyno count of the given app to zero") {

@@ -20,6 +20,5 @@ import play.api.libs.json._
 case class HerokuApp(name: String)
 
 object HerokuApp {
-  implicit val appReads: Reads[HerokuApp] =
-    (JsPath \ "name").read[String].map(HerokuApp.apply)
+  implicit val appReads: Reads[HerokuApp] = Json.reads[HerokuApp]
 }

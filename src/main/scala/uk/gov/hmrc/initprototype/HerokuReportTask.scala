@@ -21,14 +21,15 @@ import java.io.File
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class HerokuReportTask(implicit herokuManager: HerokuManager, executionContext: ExecutionContext) {
+class HerokuReportTask(herokuManager: HerokuManager)(implicit executionContext: ExecutionContext) {
   import herokuManager._
 
   def getAppReleaseInfo(appName: String): Future[String] = {
-    val releasesFuture  = getAppReleasesRecursive(appName)
+    val releasesFuture  = getAppReleases(appName, range = None)
     val formationFuture = getAppFormation(appName)
 
-    for ((releases, _) <- releasesFuture; formationOption <- formationFuture) yield {
+    for ((releases, _)   <- releasesFuture;
+         formationOption <- formationFuture) yield {
       val HerokuFormation(size, quantity, _) = formationOption.getOrElse(HerokuFormation("", 0, HerokuApp(appName)))
 
       val created     = releases.head.createdAt
@@ -48,7 +49,7 @@ class HerokuReportTask(implicit herokuManager: HerokuManager, executionContext: 
     if (args.length < 1) {
       throw new Exception("Missing path to apps file")
     }
-    val reportFilePath = args(0)
+    val reportFilePath = args.head
     getAppsReleases.map { apps =>
       val reportWriter = new PrintWriter(new File(reportFilePath))
 
@@ -64,10 +65,10 @@ class HerokuReportTask(implicit herokuManager: HerokuManager, executionContext: 
 }
 
 object HerokuReportTask extends App {
-  implicit val ec: ExecutionContext                     = ExecutionContext.global
-  implicit val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration
-  implicit val herokuManager: HerokuManager             = new HerokuManager
-  val herokuTask                                        = new HerokuReportTask
+  implicit val ec: ExecutionContext            = ExecutionContext.global
+  val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration
+  val herokuManager: HerokuManager             = new HerokuManager(herokuConfiguration)
+  val herokuTask                               = new HerokuReportTask(herokuManager)
 
   Await.result(herokuTask.getAppsReleases(args), herokuConfiguration.timeout)
 }

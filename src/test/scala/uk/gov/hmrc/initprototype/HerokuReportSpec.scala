@@ -25,19 +25,18 @@ import scala.concurrent.Future
 import scala.io.Source
 
 class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with AwaitSupport {
-  implicit val config: HerokuConfiguration = mock[HerokuConfiguration]
-  implicit val mockManager: HerokuManager  = mock[HerokuManager]
+  val mockManager: HerokuManager = mock[HerokuManager]
 
   describe("HerokuReportTask") {
-    val herokuTask = new HerokuReportTask
+    val herokuTask = new HerokuReportTask(mockManager)
 
     describe("getAppsReleases") {
       when(mockManager.getAppNames)
         .thenReturn(Future.successful(Seq("my-other-app", "my-test-app")))
-      when(mockManager.getAppReleasesRecursive("my-other-app"))
+      when(mockManager.getAppReleases("my-other-app", range = None))
         .thenReturn(Future.successful(
           (Seq(HerokuRelease("2019-12-01", "First release"), HerokuRelease("2019-12-02", "Second release")), None)))
-      when(mockManager.getAppReleasesRecursive("my-test-app"))
+      when(mockManager.getAppReleases("my-test-app", range = None))
         .thenReturn(Future.successful(
           (Seq(HerokuRelease("2019-12-03", "First release"), HerokuRelease("2019-12-04", "Second release")), None)))
       when(mockManager.getAppFormation("my-other-app"))

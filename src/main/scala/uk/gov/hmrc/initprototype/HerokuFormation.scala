@@ -17,14 +17,9 @@
 package uk.gov.hmrc.initprototype
 
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 case class HerokuFormation(size: String, quantity: Int, app: HerokuApp)
 
 object HerokuFormation {
-  implicit val formationReads: Reads[HerokuFormation] = (
-    (JsPath \ "size").read[String] and
-      (JsPath \ "quantity").read[Int] and
-      (JsPath \ "app").read[HerokuApp]
-  )(HerokuFormation.apply _)
+  implicit val formationReads: Reads[HerokuFormation] = Json.reads[HerokuFormation]
 }
