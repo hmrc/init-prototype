@@ -1,0 +1,37 @@
+{
+  "id" : "169e48aa-4375-37f8-8d22-3878e5c7c718",
+  "request" : {
+    "urlPattern" : "/apps/([a-z\\-]*)/formation/web",
+    "method" : "PATCH",
+    "headers" : {
+      "Content-Type": {
+        "equalTo": "application/json"
+      },
+      "Authorization" : {
+        "equalTo" : "Bearer dummy-token"
+      },
+      "Accept" : {
+        "equalTo" : "application/vnd.heroku+json; version=3"
+      }
+    },
+    "bodyPatterns" : [ {
+      "equalToJson" : "{\"quantity\":0,\"size\":\"Standard-1X\",\"type\":\"web\"}\n",
+      "ignoreArrayOrder" : true,
+      "ignoreExtraElements" : true
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-apps-test-app.json",
+    "headers" : {
+      "Cache-Control" : "private, no-cache",
+      "Content-Type" : "application/json",
+      "Oauth-Scope" : "global",
+      "Oauth-Scope-Accepted" : "global write write-protected",
+      "Ratelimit-Multiplier" : "1",
+      "Ratelimit-Remaining" : "4499",
+      "Vary" : "Authorization,Accept-Encoding"
+    }
+  },
+  "uuid" : "169e48aa-4375-37f8-8d22-3878e5c7c718"
+}

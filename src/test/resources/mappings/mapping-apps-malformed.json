@@ -1,0 +1,20 @@
+{
+  "id": "69f6dba1-a43a-361f-b686-2fe75a54e750",
+  "request": {
+    "url": "/apps/",
+    "method": "GET",
+    "headers": {
+      "Authorization": {
+        "equalTo": "Bearer malformed-token"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName" : "malformed.txt",
+    "headers" : {
+      "Content-Type" : "application/json"
+    }
+  },
+  "uuid": "69f6dba1-a43a-361f-b686-2fe75a54e750"
+}

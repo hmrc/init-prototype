@@ -1,0 +1,34 @@
+[
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "any-app"
+    },
+    "created_at": "2020-02-25T14:25:39Z",
+    "description": "Third release",
+    "status": "succeeded",
+    "updated_at": "2020-02-25T14:25:39Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 201,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "any-app"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Fourth release",
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 202,
+    "current": false,
+    "output_stream_url": null
+  }
+]

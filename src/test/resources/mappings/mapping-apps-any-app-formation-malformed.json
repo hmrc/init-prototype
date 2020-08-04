@@ -1,0 +1,20 @@
+{
+  "id" : "016ce50e-db66-3ff6-9fd7-d39186856b12",
+  "request" : {
+    "urlPattern" : "/apps/([a-z\\-]*)/formation/",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer malformed-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "malformed.txt",
+    "headers" : {
+      "Content-Type" : "application/json"
+    }
+  },
+  "uuid" : "016ce50e-db66-3ff6-9fd7-d39186856b12"
+}

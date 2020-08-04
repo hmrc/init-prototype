@@ -1,0 +1,20 @@
+{
+  "id" : "02f21db1-e86a-383b-9081-3e621af7a53b",
+  "request" : {
+    "urlPattern" : "/apps/([a-z\\-]*)/releases/",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer malformed-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "malformed.txt",
+    "headers" : {
+      "Content-Type" : "application/json"
+    }
+  },
+  "uuid" : "02f21db1-e86a-383b-9081-3e621af7a53b"
+}
