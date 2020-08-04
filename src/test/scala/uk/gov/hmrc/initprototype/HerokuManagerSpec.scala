@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.{getRequestedFor, patchRe
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-
+import com.fasterxml.jackson.core.JsonParseException
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -58,6 +58,20 @@ class HerokuManagerSpec
         }
 
         thrown.getMessage should startWith regex "Error with Heroku request"
+      }
+
+      it("should throw an error if the response is malformed JSON") {
+        val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
+          override val apiToken        = "malformed-token"
+          override val baseUrl: String = endpointMockUrl
+        }
+        val otherHerokuManager = new HerokuManager(incorrectConfig)
+
+        val thrown = intercept[JsonParseException] {
+          await(otherHerokuManager.getAppNames)
+        }
+
+        thrown.getMessage should startWith regex "Unrecognized token"
       }
 
       it("should call the Heroku api") {
@@ -104,6 +118,20 @@ class HerokuManagerSpec
         thrown.getMessage should startWith regex "Error with Heroku request"
       }
 
+      it("should throw an error if the response is malformed JSON") {
+        val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
+          override val apiToken        = "malformed-token"
+          override val baseUrl: String = endpointMockUrl
+        }
+        val otherHerokuManager = new HerokuManager(incorrectConfig)
+
+        val thrown = intercept[JsonParseException] {
+          await(otherHerokuManager.getAppReleasesFromRange("my-sample-app", None))
+        }
+
+        thrown.getMessage should startWith regex "Unrecognized token"
+      }
+
       it("should call the Heroku api") {
         await(herokuManager.getAppReleasesFromRange("my-other-app", None))
 
@@ -131,6 +159,20 @@ class HerokuManagerSpec
         }
 
         thrown.getMessage should startWith regex "Error with Heroku request"
+      }
+
+      it("should throw an error if the response is malformed JSON") {
+        val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
+          override val apiToken        = "malformed-token"
+          override val baseUrl: String = endpointMockUrl
+        }
+        val otherHerokuManager = new HerokuManager(incorrectConfig)
+
+        val thrown = intercept[JsonParseException] {
+          await(otherHerokuManager.getAppFormation("my-sample-app"))
+        }
+
+        thrown.getMessage should startWith regex "Unrecognized token"
       }
 
       it("should call the Heroku api") {
@@ -168,6 +210,20 @@ class HerokuManagerSpec
         intercept[Exception] {
           await(otherHerokuManager.spinDownApp("my-sample-app"))
         }
+      }
+
+      it("should throw an error if the response is malformed JSON") {
+        val incorrectConfig: HerokuConfiguration = new HerokuConfiguration {
+          override val apiToken        = "malformed-token"
+          override val baseUrl: String = endpointMockUrl
+        }
+        val otherHerokuManager = new HerokuManager(incorrectConfig)
+
+        val thrown = intercept[JsonParseException] {
+          await(otherHerokuManager.spinDownApp("my-sample-app"))
+        }
+
+        thrown.getMessage should startWith regex "Unrecognized token"
       }
 
       it("should call the Heroku api") {
