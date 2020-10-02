@@ -36,12 +36,12 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
       .thenReturn(Future.successful(Seq("my-other-app", "my-test-app")))
     when(mockManager.getAppReleases("my-other-app", range = None))
       .thenReturn(Future.successful(
-        (Seq(HerokuRelease("2019-12-01", "First release"), HerokuRelease("2019-12-02", "Second release")), None)))
+        (Seq(HerokuRelease("2019-12-01", "First release", "gerald@example.com"), HerokuRelease("2019-12-02", "Second release", "john@example.com")), None)))
     when(mockManager.getAppReleases("my-test-app", range = None))
       .thenReturn(Future.successful(
         (Seq(
-          HerokuRelease("2019-12-03", "First release"),
-          HerokuRelease("2019-12-04", "Second release")
+          HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
+          HerokuRelease("2019-12-04", "Second release", "john@example.com")
         ), None)))
     when(mockManager.getAppFormation("my-other-app"))
       .thenReturn(Future.successful(Some(HerokuFormation("Standard-1X", 1, HerokuApp("my-other-app")))))
@@ -71,8 +71,8 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
         when(mockManager.getAppReleases("my-test-app", range = None))
           .thenReturn(Future.successful(
             (Seq(
-              HerokuRelease("2019-12-03", "First release"),
-              HerokuRelease("2019-12-04", "Second release"),
+              HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
+              HerokuRelease("2019-12-04", "Second release", "john@example.com"),
               HerokuRelease("2020-02-01", "Admin release", "admin@example.com")
             ), None)))
 
