@@ -27,6 +27,10 @@ sbt -Dheroku.apiToken=REPLACE_WITH_TOKEN "generateHerokuReport report.txt"
 This generates a tab-separated plain text file, report.txt, in the repository root directory that can
 be imported into a spreadsheet for manipulation.
 
+The usage report, by default, disregards automated releases made by the Heroku API maintenance user. This can be 
+changed or additional email addresses added to this exclude list by modifying the heroku.administratorEmails key
+in [application.conf](src/main/resources/application.conf)
+
 ## Spinning down Heroku prototypes
 
 To spin down multiple prototypes, create a plain text file, e.g. spin-down-list.txt,
@@ -99,4 +103,3 @@ prototype-2	prototype-2-prototype	FALSE
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
-    

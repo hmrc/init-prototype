@@ -21,7 +21,7 @@ import java.io.File
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class HerokuReportTask(herokuManager: HerokuManager)(implicit executionContext: ExecutionContext) {
+class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: HerokuConfiguration)(implicit executionContext: ExecutionContext) {
   import herokuManager._
 
   def getAppReleaseInfo(appName: String): Future[String] = {
@@ -32,10 +32,12 @@ class HerokuReportTask(herokuManager: HerokuManager)(implicit executionContext: 
          formationOption <- formationFuture) yield {
       val HerokuFormation(size, quantity, _) = formationOption.getOrElse(HerokuFormation("", 0, HerokuApp(appName)))
 
-      val created     = releases.head.createdAt
-      val lastUpdated = releases.last.createdAt
+      val userReleases = releases.filter(release => !herokuConfiguration.administratorEmails.contains(release.email))
+      val created     = userReleases.head.createdAt
+      val lastUpdated = userReleases.last.createdAt
+      val numberOfReleases = userReleases.size
 
-      s"$appName\t$quantity\t$size\t${releases.size}\t$created\t$lastUpdated"
+      s"$appName\t$quantity\t$size\t$numberOfReleases\t$created\t$lastUpdated"
     }
   }
 
@@ -68,7 +70,7 @@ object HerokuReportTask extends App {
   implicit val ec: ExecutionContext            = ExecutionContext.global
   val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration
   val herokuManager: HerokuManager             = new HerokuManager(herokuConfiguration)
-  val herokuTask                               = new HerokuReportTask(herokuManager)
+  val herokuTask                               = new HerokuReportTask(herokuManager, herokuConfiguration)
 
   Await.result(herokuTask.getAppsReleases(args), herokuConfiguration.timeout)
 }

@@ -18,11 +18,12 @@ package uk.gov.hmrc.initprototype
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class HerokuRelease(createdAt: String, description: String)
+case class HerokuRelease(createdAt: String, description: String, email: String = "")
 
 object HerokuRelease {
   implicit val herokuReleaseReads: Reads[HerokuRelease] = (
     (JsPath \ "created_at").read[String] and
-      (JsPath \ "description").read[String]
+      (JsPath \ "description").read[String] and
+      (JsPath \ "user" \ "email").read[String]
   )(HerokuRelease.apply _)
 }
