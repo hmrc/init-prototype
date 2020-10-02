@@ -186,9 +186,9 @@ class HerokuManagerSpec
       it("should get all the releases for the given app") {
         val (releases, _) = await(herokuManager.getAppReleases("any-app", range = None), 10 second)
 
-        releases.size             should be(4)
+        releases.size             should be(5)
         releases.head.description should equal("Initial release")
-        releases(3).description   should equal("Fourth release")
+        releases(4).description   should equal("Enable allow-multiple-sni-endpoints feature")
       }
     }
 
