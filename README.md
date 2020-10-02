@@ -56,6 +56,46 @@ Finished Heroku request: /apps/prototype-three/formation/web
 [success] Total time: 1 s, completed 24-Jul-2020 16:49:32
 ```
 
+### Comparing Heroku app repositories with their corresponding HMRC repositories
+
+The script [compare-repositories.sh](bin/compare-repositories.sh) has been designed to systematically compare a set of Heroku repositories
+with their corresponding HMRC repositories for the purposes of:
+* determining whether all commits are backed-up in the HMRC repository
+* assessing whether it is safe to delete the Heroku repository
+
+First create an empty directory,
+
+```shell script
+mkdir -p ~/projects/prototypes 
+```
+
+Next create a tab-separated-value (TSV) file whose first column contains the name of the heroku App and second column
+contains the name of the hmrc repository within the Github HMRC organisation. For example,
+
+```text
+herokuApp	hmrcRepository
+prototype-1	prototype-1-prototype
+prototype-2	prototype-2-prototype
+```
+
+Save the file to the directory you just created, for example, `~/projects/prototypes/apps.tsv`
+
+Assuming you have cloned this repository to `~/projects/hmrc/init-prototype`, run the script as follows,
+
+```shell script
+cd ~/projects/prototypes && \
+~/projects/hmrc/init-prototype/bin/compare-repositories.sh apps.tsv > out.tsv
+```
+
+The output saved to `out.tsv` indicates for each Heroku app, whether the HMRC repository is the same
+as the Heroku repository with TRUE or FALSE. For example,
+
+```text
+herokuApp	hmrcRepository	isSynced
+prototype-1	prototype-1-prototype	TRUE
+prototype-2	prototype-2-prototype	FALSE
+```
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
