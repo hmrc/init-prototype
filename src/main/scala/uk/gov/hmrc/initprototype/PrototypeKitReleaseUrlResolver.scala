@@ -29,7 +29,7 @@ object PrototypeKitReleaseUrlResolver {
 
     val latestReleaseUrl = s"$repoApiUrl/releases/latest"
 
-    val headers = Seq(
+    val headers                        = Seq(
       "content-type" -> "application/json"
     ) ++ token.map(token => "Authorization" -> s"token $token")
 
@@ -44,12 +44,13 @@ object PrototypeKitReleaseUrlResolver {
       val jsonFieldName = "zipball_url"
       (Json.parse(responseBody) \ jsonFieldName).asOpt[String] match {
         case Some(v) => Right(v)
-        case None =>
+        case None    =>
           Left(s"'$jsonFieldName' is not found in json response: ${Json.prettyPrint(Json.parse(responseBody))}")
       }
     } else {
       Left(
-        s"HTTP error (${response.code}) while getting the release zip artifact from $latestReleaseUrl: $responseBody")
+        s"HTTP error (${response.code}) while getting the release zip artifact from $latestReleaseUrl: $responseBody"
+      )
     }
   }
 }

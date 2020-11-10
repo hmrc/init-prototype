@@ -51,7 +51,7 @@ class HerokuManagerSpec
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[Exception] {
           await(otherHerokuManager.getAppNames)
@@ -65,7 +65,7 @@ class HerokuManagerSpec
           override val apiToken        = "malformed-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[JsonParseException] {
           await(otherHerokuManager.getAppNames)
@@ -109,7 +109,7 @@ class HerokuManagerSpec
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[Exception] {
           await(otherHerokuManager.getAppReleasesFromRange("my-sample-app", None))
@@ -123,7 +123,7 @@ class HerokuManagerSpec
           override val apiToken        = "malformed-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[JsonParseException] {
           await(otherHerokuManager.getAppReleasesFromRange("my-sample-app", None))
@@ -152,7 +152,7 @@ class HerokuManagerSpec
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[Exception] {
           await(otherHerokuManager.getAppFormation("my-sample-app"))
@@ -166,7 +166,7 @@ class HerokuManagerSpec
           override val apiToken        = "malformed-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[JsonParseException] {
           await(otherHerokuManager.getAppFormation("my-sample-app"))
@@ -205,7 +205,7 @@ class HerokuManagerSpec
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         intercept[Exception] {
           await(otherHerokuManager.spinDownApp("my-sample-app"))
@@ -217,7 +217,7 @@ class HerokuManagerSpec
           override val apiToken        = "malformed-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherHerokuManager = new HerokuManager(incorrectConfig)
+        val otherHerokuManager                   = new HerokuManager(incorrectConfig)
 
         val thrown = intercept[JsonParseException] {
           await(otherHerokuManager.spinDownApp("my-sample-app"))

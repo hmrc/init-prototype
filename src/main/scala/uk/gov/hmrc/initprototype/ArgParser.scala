@@ -21,13 +21,14 @@ object ArgParser {
   val DEFAULT_BOOTSTRAP_TAG = "0.1.0"
 
   case class Config(
-    githubUsername: String     = "",
-    githubToken: String        = "",
+    githubUsername: String = "",
+    githubToken: String = "",
     templateRepoApiUrl: String = "",
-    targetGithubHost: String   = "",
-    targetOrg: String          = "",
-    targetRepoName: String     = "",
-    verbose: Boolean           = false)
+    targetGithubHost: String = "",
+    targetOrg: String = "",
+    targetRepoName: String = "",
+    verbose: Boolean = false
+  )
 
   val currentVersion = Option(getClass.getPackage.getImplementationVersion).getOrElse("(version not found)")
 

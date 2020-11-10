@@ -60,7 +60,8 @@ class GithubArtifactDownloader() {
     logger.debug(s"Response code: ${bs.code}")
     if (bs.isError) {
       logger.error(
-        s"Looks like we have encountered an error downloading the zip file from github:\n${new String(bs.body)}")
+        s"Looks like we have encountered an error downloading the zip file from github:\n${new String(bs.body)}"
+      )
       System.exit(-1)
     }
     logger.debug(s"Got ${bs.body.length} bytes from $githubZipUri... saving it to $artifactDownloadPath")

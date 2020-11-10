@@ -27,11 +27,8 @@ class HerokuSpinDownTask(herokuManager: HerokuManager)(implicit ec: ExecutionCon
 
   def spinDownAppsFromFile(appsFile: String): Future[Seq[HerokuFormation]] = {
     val apps = Source.fromFile(appsFile, "UTF-8")
-    try {
-      spinDownApps(apps.getLines.toSeq)
-    } finally {
-      apps.close()
-    }
+    try spinDownApps(apps.getLines.toSeq)
+    finally apps.close()
   }
 
   def spinDownAppsFromFiles(appsFiles: Seq[String]): Future[Seq[Seq[HerokuFormation]]] = Future.sequence(

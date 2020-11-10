@@ -32,7 +32,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
 
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/latest",
+        url = "/releases/latest",
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
@@ -50,7 +50,8 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
             |  "zipball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0",
             |  "body": "bla"
             |}""".stripMargin),
-          Map.empty)
+          Map.empty
+        )
       )
 
       PrototypeKitReleaseUrlResolver
@@ -63,7 +64,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     it("should be correctly extracted if Github requires authorisation") {
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/latest",
+        url = "/releases/latest",
         extraHeaders = Map(
           "Authorization" -> "token 1111111111"
         ),
@@ -72,7 +73,8 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
           Some("""{
             |  "zipball_url": "https://url-to-zip-archive"
             |}""".stripMargin),
-          Map.empty)
+          Map.empty
+        )
       )
 
       PrototypeKitReleaseUrlResolver
@@ -84,7 +86,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     it("should be correctly extracted if Github requires a different authorisation token") {
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/latest",
+        url = "/releases/latest",
         extraHeaders = Map(
           "Authorization" -> "token 2222222222"
         ),
@@ -93,7 +95,8 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
           Some("""{
             |  "zipball_url": "https://url-to-zip-archive"
             |}""".stripMargin),
-          Map.empty)
+          Map.empty
+        )
       )
 
       PrototypeKitReleaseUrlResolver
@@ -109,9 +112,10 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
                               |  "documentation_url":"https://developer.github.com/v3/#rate-limiting"
                               |}""".stripMargin
       givenGitHubExpects(
-        method          = GET,
-        url             = "/releases/latest",
-        willRespondWith = (403, Some(errorFromRemote), Map.empty))
+        method = GET,
+        url = "/releases/latest",
+        willRespondWith = (403, Some(errorFromRemote), Map.empty)
+      )
 
       PrototypeKitReleaseUrlResolver
         .getLatestZipballUrl(endpointMockUrl)
@@ -123,7 +127,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
 
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/latest",
+        url = "/releases/latest",
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
@@ -135,12 +139,13 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
             |  "documentation_url": "https://developer.github.com/v3/#http-redirects"
             |}
             |""".stripMargin),
-          Map("Location" -> s"$endpointMockUrl/releases/redirect-target"))
+          Map("Location" -> s"$endpointMockUrl/releases/redirect-target")
+        )
       )
 
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/redirect-target",
+        url = "/releases/redirect-target",
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
@@ -158,7 +163,8 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
             |  "zipball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0",
             |  "body": "bla"
             |}""".stripMargin),
-          Map.empty)
+          Map.empty
+        )
       )
 
       PrototypeKitReleaseUrlResolver
@@ -171,7 +177,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     it("should follow redirects retrieved from github and pass on any authorisation") {
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/latest",
+        url = "/releases/latest",
         extraHeaders = Map(
           "Authorization" -> "token abc"
         ),
@@ -183,12 +189,13 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
              |  "documentation_url": "https://developer.github.com/v3/#http-redirects"
              |}
              |""".stripMargin),
-          Map("Location" -> s"$endpointMockUrl/releases/redirect-target"))
+          Map("Location" -> s"$endpointMockUrl/releases/redirect-target")
+        )
       )
 
       givenGitHubExpects(
         method = GET,
-        url    = "/releases/redirect-target",
+        url = "/releases/redirect-target",
         extraHeaders = Map(
           "Authorization" -> "token abc"
         ),
@@ -197,19 +204,24 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
           Some("""{
             |  "zipball_url": "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
             |}""".stripMargin),
-          Map.empty)
+          Map.empty
+        )
       )
 
-      PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl, Some("abc")).right.value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
+      PrototypeKitReleaseUrlResolver
+        .getLatestZipballUrl(endpointMockUrl, Some("abc"))
+        .right
+        .value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
     }
 
     it("should produce error message on http error") {
 
       givenGitHubExpects(
-        method          = GET,
-        url             = "/releases/latest",
-        extraHeaders    = Map("content-type" -> "application/json"),
-        willRespondWith = (404, Some("THE ERROR FROM REMOTE"), Map.empty))
+        method = GET,
+        url = "/releases/latest",
+        extraHeaders = Map("content-type" -> "application/json"),
+        willRespondWith = (404, Some("THE ERROR FROM REMOTE"), Map.empty)
+      )
 
       PrototypeKitReleaseUrlResolver
         .getLatestZipballUrl(endpointMockUrl)
@@ -227,10 +239,11 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
          |}""".stripMargin
 
       givenGitHubExpects(
-        method          = GET,
-        url             = "/releases/latest",
-        extraHeaders    = Map("content-type" -> "application/json"),
-        willRespondWith = (200, Some(jsonReponse), Map.empty))
+        method = GET,
+        url = "/releases/latest",
+        extraHeaders = Map("content-type" -> "application/json"),
+        willRespondWith = (200, Some(jsonReponse), Map.empty)
+      )
 
       PrototypeKitReleaseUrlResolver
         .getLatestZipballUrl(endpointMockUrl)
@@ -244,7 +257,8 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     method: RequestMethod,
     url: String,
     extraHeaders: Map[String, String] = Map(),
-    willRespondWith: (Int, Option[String], Map[String, String])): Unit = {
+    willRespondWith: (Int, Option[String], Map[String, String])
+  ): Unit = {
 
     val builder = extraHeaders.foldLeft(request(method.toString, urlEqualTo(url))) { (acc, header) =>
       acc.withHeader(header._1, equalTo(header._2))

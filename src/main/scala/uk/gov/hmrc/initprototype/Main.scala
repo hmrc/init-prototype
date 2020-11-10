@@ -76,7 +76,7 @@ object Main {
         if (pushResult.exitCode != 0) {
           throw new RuntimeException(s"Unable to push to remote repo.")
         }
-      case Failure(t) => throw new RuntimeException(s"Unable to push to remote repo.")
+      case Failure(t)          => throw new RuntimeException(s"Unable to push to remote repo.")
     }
 
   }
@@ -88,10 +88,10 @@ object Main {
       PrototypeKitReleaseUrlResolver.getLatestZipballUrl(config.templateRepoApiUrl, Some(config.githubToken))
 
     eitherErrorOrUrl match {
-      case Left(e) =>
+      case Left(e)             =>
         throw new RuntimeException(e)
       case Right(githubZipUrl) =>
-        val tempPath = FileUtils.getTempDirectory.toPath
+        val tempPath             = FileUtils.getTempDirectory.toPath
         gitClone(tempPath.toString, config, credentials.token)
         val artifactDownloadPath = tempPath.resolve("prototype-template-archive.zip").toString
         val localExplodedPath    = new GithubArtifactDownloader().getRepoZipAndExplode(githubZipUrl, artifactDownloadPath)

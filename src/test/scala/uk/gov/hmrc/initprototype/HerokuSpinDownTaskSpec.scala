@@ -57,13 +57,9 @@ class HerokuSpinDownTaskSpec
         file.deleteOnExit()
 
         val appsFile = new PrintWriter(file)
-        try {
-          for (app <- apps) {
-            appsFile.println(app)
-          }
-        } finally {
-          appsFile.close()
-        }
+        try for (app <- apps)
+          appsFile.println(app)
+        finally appsFile.close()
 
         file.getAbsolutePath
       }
