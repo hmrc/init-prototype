@@ -13,7 +13,7 @@ lazy val InitPrototype = Project(libName, file("."))
     AssemblySettings(),
     parallelExecution := false,
     addArtifact(artifact in (Compile, assembly), assembly)
-)
+  )
 
 val spinDownHerokuApps = inputKey[Unit]("Spin down the heroku apps listed in the given file.")
 fullRunInputTask(spinDownHerokuApps, Compile, "uk.gov.hmrc.initprototype.HerokuSpinDownTask")

@@ -42,7 +42,7 @@ trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfter
     endpointMock.resetMappings()
     endpointMock.resetScenarios()
   }
-  override def afterAll(): Unit =
+  override def afterAll(): Unit  =
     endpointServer.stop()
   override def beforeAll(): Unit =
     endpointServer.start()

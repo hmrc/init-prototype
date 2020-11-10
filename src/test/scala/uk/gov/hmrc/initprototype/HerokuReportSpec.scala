@@ -26,7 +26,7 @@ import scala.concurrent.Future
 import scala.io.Source
 
 class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with AwaitSupport with BeforeAndAfterEach {
-  val mockManager: HerokuManager = mock[HerokuManager]
+  val mockManager: HerokuManager               = mock[HerokuManager]
   val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration {
     override val administratorEmails: List[String] = List("admin@example.com")
   }
@@ -35,14 +35,29 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
     when(mockManager.getAppNames)
       .thenReturn(Future.successful(Seq("my-other-app", "my-test-app")))
     when(mockManager.getAppReleases("my-other-app", range = None))
-      .thenReturn(Future.successful(
-        (Seq(HerokuRelease("2019-12-01", "First release", "gerald@example.com"), HerokuRelease("2019-12-02", "Second release", "john@example.com")), None)))
+      .thenReturn(
+        Future.successful(
+          (
+            Seq(
+              HerokuRelease("2019-12-01", "First release", "gerald@example.com"),
+              HerokuRelease("2019-12-02", "Second release", "john@example.com")
+            ),
+            None
+          )
+        )
+      )
     when(mockManager.getAppReleases("my-test-app", range = None))
-      .thenReturn(Future.successful(
-        (Seq(
-          HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
-          HerokuRelease("2019-12-04", "Second release", "john@example.com")
-        ), None)))
+      .thenReturn(
+        Future.successful(
+          (
+            Seq(
+              HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
+              HerokuRelease("2019-12-04", "Second release", "john@example.com")
+            ),
+            None
+          )
+        )
+      )
     when(mockManager.getAppFormation("my-other-app"))
       .thenReturn(Future.successful(Some(HerokuFormation("Standard-1X", 1, HerokuApp("my-other-app")))))
     when(mockManager.getAppFormation("my-test-app"))
@@ -54,7 +69,6 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
 
     describe("getAppsReleases") {
 
-
       it("should get apps releases") {
         val result: Seq[String] = await(herokuTask.getAppsReleases)
 
@@ -63,18 +77,24 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
             "name\tnumberOfUnits\tdynoSize\tnumberOfReleases\tcreated\tlastUpdated",
             "my-other-app\t1\tStandard-1X\t2\t2019-12-01\t2019-12-02",
             "my-test-app\t2\tStandard-2X\t2\t2019-12-03\t2019-12-04"
-          ))
+          )
+        )
       }
-
 
       it("should exclude any releases with admin email addresses") {
         when(mockManager.getAppReleases("my-test-app", range = None))
-          .thenReturn(Future.successful(
-            (Seq(
-              HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
-              HerokuRelease("2019-12-04", "Second release", "john@example.com"),
-              HerokuRelease("2020-02-01", "Admin release", "admin@example.com")
-            ), None)))
+          .thenReturn(
+            Future.successful(
+              (
+                Seq(
+                  HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
+                  HerokuRelease("2019-12-04", "Second release", "john@example.com"),
+                  HerokuRelease("2020-02-01", "Admin release", "admin@example.com")
+                ),
+                None
+              )
+            )
+          )
 
         val result: Seq[String] = await(herokuTask.getAppsReleases)
 
@@ -83,9 +103,9 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
             "name\tnumberOfUnits\tdynoSize\tnumberOfReleases\tcreated\tlastUpdated",
             "my-other-app\t1\tStandard-1X\t2\t2019-12-01\t2019-12-02",
             "my-test-app\t2\tStandard-2X\t2\t2019-12-03\t2019-12-04"
-          ))
+          )
+        )
       }
-
 
       def createReportFile: String = {
         import java.io.File
@@ -100,16 +120,14 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
         await(herokuTask.getAppsReleases(Array(reportFile)))
 
         val report = Source.fromFile(reportFile, "UTF-8")
-        try {
-          report.getLines.toSeq should equal(
-            Seq(
-              "name\tnumberOfUnits\tdynoSize\tnumberOfReleases\tcreated\tlastUpdated",
-              "my-other-app\t1\tStandard-1X\t2\t2019-12-01\t2019-12-02",
-              "my-test-app\t2\tStandard-2X\t2\t2019-12-03\t2019-12-04"
-            ))
-        } finally {
-          report.close()
-        }
+        try report.getLines.toSeq should equal(
+          Seq(
+            "name\tnumberOfUnits\tdynoSize\tnumberOfReleases\tcreated\tlastUpdated",
+            "my-other-app\t1\tStandard-1X\t2\t2019-12-01\t2019-12-02",
+            "my-test-app\t2\tStandard-2X\t2\t2019-12-03\t2019-12-04"
+          )
+        )
+        finally report.close()
       }
 
       it("should throw an error if no arguments are supplied") {

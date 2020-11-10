@@ -35,11 +35,11 @@ class GithubArtifactDownloaderSpec extends AnyFunSpec with WireMockEndpoints wit
 
   describe("getRepoZipAndExplode") {
     it("should download zip from github using correct details") {
-      val url   = s"$endpointMockUrl/xyz"
+      val url = s"$endpointMockUrl/xyz"
 
       givenGitHubExpects(
         method = GET,
-        url    = "/xyz",
+        url = "/xyz",
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
@@ -60,7 +60,8 @@ class GithubArtifactDownloaderSpec extends AnyFunSpec with WireMockEndpoints wit
     method: RequestMethod,
     url: String,
     extraHeaders: Map[String, String] = Map(),
-    willRespondWithFileContents: (Int, Option[FilePath])): Unit = {
+    willRespondWithFileContents: (Int, Option[FilePath])
+  ): Unit = {
     val builder = extraHeaders.foldLeft(request(method.toString, urlEqualTo(url))) { (acc, header) =>
       acc.withHeader(header._1, equalTo(header._2))
     }

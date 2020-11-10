@@ -11,7 +11,7 @@ object AssemblySettings {
       case "module-info.class"                                      => MergeStrategy.discard
       case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.first
       case PathList("play", "core", "server", xs @ _*)              => MergeStrategy.first
-      case x =>
+      case x                                                        =>
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
     },

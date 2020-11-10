@@ -1,7 +1,8 @@
 logLevel := Level.Info
 
-resolvers += Resolver.url("hmrc-sbt-plugin-releases",
-  url("https://dl.bintray.com/hmrc/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
+resolvers += Resolver.url("hmrc-sbt-plugin-releases", url("https://dl.bintray.com/hmrc/sbt-plugin-releases"))(
+  Resolver.ivyStylePatterns
+)
 
 resolvers += "HMRC Releases" at "https://dl.bintray.com/hmrc/releases"
 
@@ -13,3 +14,4 @@ addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.2.0")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.10")
 
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")

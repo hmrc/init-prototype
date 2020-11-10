@@ -21,20 +21,24 @@ import java.io.File
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: HerokuConfiguration)(implicit executionContext: ExecutionContext) {
+class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: HerokuConfiguration)(implicit
+  executionContext: ExecutionContext
+) {
   import herokuManager._
 
   def getAppReleaseInfo(appName: String): Future[String] = {
     val releasesFuture  = getAppReleases(appName, range = None)
     val formationFuture = getAppFormation(appName)
 
-    for ((releases, _)   <- releasesFuture;
-         formationOption <- formationFuture) yield {
+    for (
+      (releases, _)   <- releasesFuture;
+      formationOption <- formationFuture
+    ) yield {
       val HerokuFormation(size, quantity, _) = formationOption.getOrElse(HerokuFormation("", 0, HerokuApp(appName)))
 
-      val userReleases = releases.filter(release => !herokuConfiguration.administratorEmails.contains(release.email))
-      val created     = userReleases.head.createdAt
-      val lastUpdated = userReleases.last.createdAt
+      val userReleases     = releases.filter(release => !herokuConfiguration.administratorEmails.contains(release.email))
+      val created          = userReleases.head.createdAt
+      val lastUpdated      = userReleases.last.createdAt
       val numberOfReleases = userReleases.size
 
       s"$appName\t$quantity\t$size\t$numberOfReleases\t$created\t$lastUpdated"
@@ -55,13 +59,9 @@ class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: Heroku
     getAppsReleases.map { apps =>
       val reportWriter = new PrintWriter(new File(reportFilePath))
 
-      try {
-        for (app <- apps) {
-          reportWriter.println(app)
-        }
-      } finally {
-        reportWriter.close()
-      }
+      try for (app <- apps)
+        reportWriter.println(app)
+      finally reportWriter.close()
     }
   }
 }
