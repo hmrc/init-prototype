@@ -32,7 +32,7 @@ for heroku_app_hmrc_repo in $prototypes; do
     git fetch --all --quiet || exit
 
     >&2 echo "INFO: Comparing HMRC repo $hmrc_repo with Heroku app $heroku_app"
-    if [[ ! $(git diff origin/master..heroku/master) ]]; then
+    if [[ ! $(git diff origin/main..heroku/main) ]]; then
       is_synced="TRUE"
     fi
 
