@@ -8,7 +8,6 @@ lazy val InitPrototype = Project(libName, file("."))
     scalaVersion := "2.12.10",
     scalacOptions += "-deprecation",
     libraryDependencies ++= LibDependencies.compile ++ LibDependencies.test,
-    resolvers += Resolver.typesafeRepo("releases"),
     AssemblySettings(),
     parallelExecution := false,
     addArtifact(artifact in (Compile, assembly), assembly)
