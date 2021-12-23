@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ object PrototypeKitReleaseUrlResolver {
   def getLatestZipballUrl(repoApiUrl: String, token: Option[String] = None): Either[ErrorMessage, ZipBallUrl] = {
     require(!repoApiUrl.endsWith("/"), s"repository api url should not end '/': $repoApiUrl")
 
-    val latestReleaseUrl = s"$repoApiUrl/releases/latest"
+    val latestReleaseUrl =
+      s"$repoApiUrl/releases/tags/v11.0.0" // TODO: after prototype kit has been upgraded with govuk-frontend v4.x.x we will need to revert this back to /releases/latest
 
     val headers                        = Seq(
       "content-type" -> "application/json"
