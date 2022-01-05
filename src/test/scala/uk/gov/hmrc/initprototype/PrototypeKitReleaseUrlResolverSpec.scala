@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,15 @@ import play.api.libs.json.Json
 
 class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoints with Matchers with EitherValues {
 
+  private final val releaseURL: String =
+    "/releases/tags/v11.0.0" // TODO: after prototype kit has been upgraded with govuk-frontend v4.x.x we will need to revert this back to /releases/latest
+
   describe("Latest zip url") {
     it("should be correctly extracted from the response json from github") {
 
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
@@ -64,7 +67,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     it("should be correctly extracted if Github requires authorisation") {
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map(
           "Authorization" -> "token 1111111111"
         ),
@@ -86,7 +89,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     it("should be correctly extracted if Github requires a different authorisation token") {
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map(
           "Authorization" -> "token 2222222222"
         ),
@@ -113,21 +116,21 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
                               |}""".stripMargin
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         willRespondWith = (403, Some(errorFromRemote), Map.empty)
       )
 
       PrototypeKitReleaseUrlResolver
         .getLatestZipballUrl(endpointMockUrl)
         .left
-        .value shouldBe s"HTTP error (403) while getting the release zip artifact from $endpointMockUrl/releases/latest: $errorFromRemote"
+        .value shouldBe s"HTTP error (403) while getting the release zip artifact from $endpointMockUrl$releaseURL: $errorFromRemote"
     }
 
     it("should follow redirects retrieved from github") {
 
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map(
           "content-type" -> "application/json"
         ),
@@ -177,7 +180,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
     it("should follow redirects retrieved from github and pass on any authorisation") {
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map(
           "Authorization" -> "token abc"
         ),
@@ -218,7 +221,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
 
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map("content-type" -> "application/json"),
         willRespondWith = (404, Some("THE ERROR FROM REMOTE"), Map.empty)
       )
@@ -226,7 +229,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
       PrototypeKitReleaseUrlResolver
         .getLatestZipballUrl(endpointMockUrl)
         .left
-        .value shouldBe s"HTTP error (404) while getting the release zip artifact from $endpointMockUrl/releases/latest: THE ERROR FROM REMOTE"
+        .value shouldBe s"HTTP error (404) while getting the release zip artifact from $endpointMockUrl$releaseURL: THE ERROR FROM REMOTE"
 
     }
 
@@ -240,7 +243,7 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
 
       givenGitHubExpects(
         method = GET,
-        url = "/releases/latest",
+        url = releaseURL,
         extraHeaders = Map("content-type" -> "application/json"),
         willRespondWith = (200, Some(jsonReponse), Map.empty)
       )
