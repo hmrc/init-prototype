@@ -27,8 +27,7 @@ object PrototypeKitReleaseUrlResolver {
   def getLatestZipballUrl(repoApiUrl: String, token: Option[String] = None): Either[ErrorMessage, ZipBallUrl] = {
     require(!repoApiUrl.endsWith("/"), s"repository api url should not end '/': $repoApiUrl")
 
-    val latestReleaseUrl =
-      s"$repoApiUrl/releases/tags/v11.0.0" // TODO: after prototype kit has been upgraded with govuk-frontend v4.x.x we will need to revert this back to /releases/latest
+    val latestReleaseUrl = s"$repoApiUrl/releases/latest"
 
     val headers                        = Seq(
       "content-type" -> "application/json"
