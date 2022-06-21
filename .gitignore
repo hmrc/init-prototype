@@ -11,3 +11,4 @@ build
 !**/jenkins/build
 *~
 out
+prototypes
