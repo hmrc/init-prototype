@@ -19,3 +19,6 @@ fullRunInputTask(spinDownHerokuApps, Compile, "uk.gov.hmrc.initprototype.HerokuS
 
 val generateHerokuReport = inputKey[Unit]("Generate a usage report from Heroku.")
 fullRunInputTask(generateHerokuReport, Compile, "uk.gov.hmrc.initprototype.HerokuReportTask")
+
+val generatePackageLockReport = inputKey[Unit]("Generates a report of prototypes' package-lock.json")
+fullRunInputTask(generatePackageLockReport, Compile, "uk.gov.hmrc.initprototype.PackageLockReportTask")
