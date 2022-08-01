@@ -1,0 +1,22 @@
+{
+  "id" : "02f21db1-e86a-383b-9081-3e621af7a53b",
+  "request" : {
+    "urlPattern" : "/search/commits.*",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "token incorrect-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 401,
+    "bodyFileName" : "body-github-auth-error.json",
+    "headers" : {
+      "Cache-Control" : "private, no-cache",
+      "Content-Type" : "application/json",
+      "Vary" : "Authorization,Accept-Encoding"
+    }
+  },
+  "uuid" : "02f21db1-e86a-383b-9081-3e621af7a53b"
+}

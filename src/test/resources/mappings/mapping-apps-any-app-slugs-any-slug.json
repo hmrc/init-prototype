@@ -1,0 +1,27 @@
+{
+  "id" : "02f21db1-e86a-383b-9081-3e621af7a53b",
+  "request" : {
+    "urlPattern" : "/apps/([a-z\\-]*)/slugs/([a-z\\-]*)",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer dummy-token"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-apps-any-app-slugs-any-slug.json",
+    "headers" : {
+      "Cache-Control" : "private, no-cache",
+      "Content-Type" : "application/json",
+      "Next-Range" : "version ]200..",
+      "Oauth-Scope" : "global",
+      "Oauth-Scope-Accepted" : "global read-protected write-protected",
+      "Ratelimit-Multiplier" : "1",
+      "Ratelimit-Remaining" : "4499",
+      "Vary" : "Authorization,Accept-Encoding"
+    }
+  },
+  "uuid" : "02f21db1-e86a-383b-9081-3e621af7a53b"
+}

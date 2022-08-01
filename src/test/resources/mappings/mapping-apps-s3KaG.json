@@ -8,22 +8,21 @@
         "equalTo": "Bearer dummy-token"
       },
       "Range": {
-        "equalTo": ";max=1000;"
+        "equalTo": "name ]my-other-app.."
       }
     }
   },
   "response": {
     "status": 200,
-    "bodyFileName": "body-apps-s2LzF.json",
+    "bodyFileName": "body-apps-s3KaG.json",
     "headers": {
       "Accept-Ranges": "id, name, updated_at",
       "Cache-Control": "private, no-cache",
       "Content-Expansion": "region",
-      "Content-Range": "name my-app..my-other-app",
+      "Content-Range": "name yet-another-app..yet-another-app",
       "Content-Type": "application/json",
       "Date": "Fri, 24 Jul 2020 09:58:47 GMT",
       "Last-Modified": "Fri, 24 Jul 2020 09:45:31 GMT",
-      "Next-Range" : "name ]my-other-app..",
       "Oauth-Scope": "global",
       "Oauth-Scope-Accepted": "global read read-protected write write-protected",
       "Ratelimit-Multiplier": "1",

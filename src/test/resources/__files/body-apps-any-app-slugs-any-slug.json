@@ -1,0 +1,21 @@
+{
+  "blob": {
+    "method": "get",
+    "url": "https://s3-eu-west-1.amazonaws.com/heroku-slugs-eu/38c1/38c17727-d09f-45fb-9be2-f9f82c7efa76.tar.gz?AWSAccessKeyId=AKIAZSXS6CXK4G6YZGNK&Signature=wT%2BoBCtJrUJi6E0Qev7CI2vjL1A%3D&Expires=1659109092"
+  },
+  "buildpack_provided_description": "Node.js",
+  "checksum": "SHA256:c9556bf6a1d6417869804dbddbe3c754e87bc0244e9ae20e499a788e827f99eb",
+  "commit": "some-commit-id",
+  "commit_description": "",
+  "created_at": "2021-08-02T15:00:14Z",
+  "id": "38c17727-d09f-45fb-9be2-f9f82c7efa76",
+  "process_types": {
+    "web": "node ./node_modules/gulp/bin/gulp generate-assets && node listen-on-port.js"
+  },
+  "size": 62965960,
+  "updated_at": "2021-08-02T15:00:14Z",
+  "stack": {
+    "id": "2be35cd6-418a-417e-9531-42c5de1dfb96",
+    "name": "heroku-20"
+  }
+}

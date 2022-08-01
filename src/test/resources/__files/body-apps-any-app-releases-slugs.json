@@ -1,0 +1,222 @@
+[
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T14:25:39Z",
+    "description": "Release 1",
+    "slug": {
+      "id": "First slug"
+    },    "status": "succeeded",
+    "updated_at": "2020-02-25T14:25:39Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 201,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 2",
+    "slug": {
+      "id": "Second slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 202,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-09-17T20:14:38Z",
+    "description": "Some internal event",
+    "slug": null,
+    "status": "succeeded",
+    "updated_at": "2020-09-17T20:14:38Z",
+    "user": {
+      "email": "api-maintenance@heroku.com"
+    },
+    "version": 203,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 3",
+    "slug": {
+      "id": "Third slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 204,
+    "current": false,
+    "output_stream_url": null
+  },  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 4",
+    "slug": {
+      "id": "Fourth slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 205,
+    "current": false,
+    "output_stream_url": null
+  },  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 5",
+    "slug": {
+      "id": "Fifth slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 206,
+    "current": false,
+    "output_stream_url": null
+  },  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 6",
+    "slug": {
+      "id": "Sixth slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 207,
+    "current": false,
+    "output_stream_url": null
+  },  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 7",
+    "slug": {
+      "id": "Seventh slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 208,
+    "current": false,
+    "output_stream_url": null
+  },  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 8",
+    "slug": {
+      "id": "Eighth slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 209,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 9",
+    "slug": {
+      "id": "Ninth slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 210,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 10",
+    "slug": {
+      "id": "Tenth slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 211,
+    "current": false,
+    "output_stream_url": null
+  },
+  {
+    "addon_plan_names": [],
+    "app": {
+      "name": "app-with-11-release-slugs"
+    },
+    "created_at": "2020-02-25T17:09:45Z",
+    "description": "Release 11",
+    "slug": {
+      "id": "Eleventh slug"
+    },
+    "status": "succeeded",
+    "updated_at": "2020-02-25T17:09:45Z",
+    "user": {
+      "email": "sample.person@example.com"
+    },
+    "version": 212,
+    "current": false,
+    "output_stream_url": null
+  }
+]

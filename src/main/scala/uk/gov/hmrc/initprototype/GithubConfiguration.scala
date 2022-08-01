@@ -18,9 +18,12 @@ package uk.gov.hmrc.initprototype
 
 import com.typesafe.config.{Config, ConfigFactory}
 
-case class PackageLockReportConfiguration() {
+class GithubConfiguration {
+  private val config: Config = ConfigFactory.load()
+  val baseUrl: String        = config.getString("github.baseUrl")
+  val apiToken: String       = config.getString("github.apiToken")
 
-  private val config: Config        = ConfigFactory.load()
-  val herokuUsageReportFile: String = config.getString("heroku.defaultReportFile")
-  val packageLockReportFile: String = config.getString("github.packageLockReportFile")
+  val connTimeoutMs: Int = config.getInt("github.connTimeoutMs")
+  val readTimeoutMs: Int = config.getInt("github.readTimeoutMs")
+
 }

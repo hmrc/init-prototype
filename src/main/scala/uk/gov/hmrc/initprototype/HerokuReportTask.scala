@@ -36,7 +36,8 @@ class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: Heroku
     ) yield {
       val HerokuFormation(size, quantity, _) = formationOption.getOrElse(HerokuFormation("", 0, HerokuApp(appName)))
 
-      val userReleases     = releases.filter(release => !herokuConfiguration.administratorEmails.contains(release.email))
+      val userReleases     =
+        releases.filterNot(release => herokuConfiguration.administratorEmails.contains(release.userEmail))
       val created          = userReleases.head.createdAt
       val lastUpdated      = userReleases.last.createdAt
       val numberOfReleases = userReleases.size
@@ -72,5 +73,5 @@ object HerokuReportTask extends App {
   val herokuManager: HerokuManager             = new HerokuManager(herokuConfiguration)
   val herokuTask                               = new HerokuReportTask(herokuManager, herokuConfiguration)
 
-  Await.result(herokuTask.getAppsReleases(args), herokuConfiguration.timeout)
+  Await.result(herokuTask.getAppsReleases(args), herokuConfiguration.jobTimeout)
 }
