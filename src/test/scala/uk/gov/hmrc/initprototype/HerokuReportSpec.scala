@@ -26,15 +26,15 @@ import scala.concurrent.Future
 import scala.io.Source
 
 class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with AwaitSupport with BeforeAndAfterEach {
-  val mockManager: HerokuManager               = mock[HerokuManager]
+  val mockHerokuConnector: HerokuConnector     = mock[HerokuConnector]
   val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration {
     override val administratorEmails: List[String] = List("admin@example.com")
   }
 
   override def beforeEach(): Unit = {
-    when(mockManager.getAppNames)
+    when(mockHerokuConnector.getAppNames)
       .thenReturn(Future.successful(Seq("my-other-app", "my-test-app")))
-    when(mockManager.getAppReleases("my-other-app", range = None))
+    when(mockHerokuConnector.getAppReleases("my-other-app", range = None))
       .thenReturn(
         Future.successful(
           (
@@ -46,7 +46,7 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
           )
         )
       )
-    when(mockManager.getAppReleases("my-test-app", range = None))
+    when(mockHerokuConnector.getAppReleases("my-test-app", range = None))
       .thenReturn(
         Future.successful(
           (
@@ -58,14 +58,14 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
           )
         )
       )
-    when(mockManager.getAppFormation("my-other-app"))
+    when(mockHerokuConnector.getAppFormation("my-other-app"))
       .thenReturn(Future.successful(Some(HerokuFormation("Standard-1X", 1, HerokuApp("my-other-app")))))
-    when(mockManager.getAppFormation("my-test-app"))
+    when(mockHerokuConnector.getAppFormation("my-test-app"))
       .thenReturn(Future.successful(Some(HerokuFormation("Standard-2X", 2, HerokuApp("my-test-app")))))
   }
 
   describe("HerokuReportTask") {
-    val herokuTask = new HerokuReportTask(mockManager, herokuConfiguration)
+    val herokuTask = new HerokuReportTask(mockHerokuConnector, herokuConfiguration)
 
     describe("getAppsReleases") {
 
@@ -82,7 +82,7 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
       }
 
       it("should exclude any releases with admin email addresses") {
-        when(mockManager.getAppReleases("my-test-app", range = None))
+        when(mockHerokuConnector.getAppReleases("my-test-app", range = None))
           .thenReturn(
             Future.successful(
               (

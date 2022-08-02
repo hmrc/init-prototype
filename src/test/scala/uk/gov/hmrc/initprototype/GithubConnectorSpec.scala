@@ -21,7 +21,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.ExecutionContext
 
-class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints {
+class GithubConnectorSpec extends AnyFunSpec with Matchers with WireMockEndpoints {
 
   implicit val ec: ExecutionContext = ExecutionContext.global
 
@@ -29,17 +29,17 @@ class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints 
     override val baseUrl: String = endpointMockUrl
   }
 
-  describe("GithubManager") {
-    val githubManager = new GithubManager(config)
+  describe("GithubConnector") {
+    val githubConnector = new GithubConnector(config)
 
     describe("getGithubRepoName") {
       it("should return the repo name related to a given github commit SHA") {
-        val maybeGithubRepo = githubManager.getGithubRepoName("some-commit-sha")
+        val maybeGithubRepo = githubConnector.getGithubRepoName("some-commit-sha")
         maybeGithubRepo should be(Some("estates-registration-iv-prototype"))
       }
 
       it("should return None if the repo name isn't found") {
-        val maybeGithubRepo = githubManager.getGithubRepoName("some-other-commit-sha")
+        val maybeGithubRepo = githubConnector.getGithubRepoName("some-other-commit-sha")
         maybeGithubRepo should be(None)
       }
 
@@ -48,10 +48,10 @@ class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints 
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherGithubManager                   = new GithubManager(incorrectConfig)
+        val otherGithubConnector                 = new GithubConnector(incorrectConfig)
 
         val thrown = intercept[Exception] {
-          otherGithubManager.getGithubRepoName("some-commit-sha")
+          otherGithubConnector.getGithubRepoName("some-commit-sha")
         }
 
         thrown.getMessage should startWith regex "Error with Github API request"
@@ -60,17 +60,17 @@ class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints 
 
     describe("repoExists") {
       it("should return true if the repo exists in Github") {
-        val repoExists = githubManager.repoExists(repo = "some-repo", owner = "some-owner")
+        val repoExists = githubConnector.repoExists(repo = "some-repo", owner = "some-owner")
         repoExists should be(true)
       }
 
       it("should return false if the repo doesn't exist") {
-        val repoExists = githubManager.repoExists(repo = "some-other-repo", owner = "some-owner")
+        val repoExists = githubConnector.repoExists(repo = "some-other-repo", owner = "some-owner")
         repoExists should be(false)
       }
 
       it("should default repo owner to hmrc") {
-        val repoExists = githubManager.repoExists(repo = "some-other-repo")
+        val repoExists = githubConnector.repoExists(repo = "some-other-repo")
         repoExists should be(true)
       }
 
@@ -79,10 +79,10 @@ class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints 
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherGithubManager                   = new GithubManager(incorrectConfig)
+        val otherGithubConnector                 = new GithubConnector(incorrectConfig)
 
         val thrown = intercept[Exception] {
-          otherGithubManager.repoExists(repo = "some-other-repo")
+          otherGithubConnector.repoExists(repo = "some-other-repo")
         }
 
         thrown.getMessage should startWith regex "Error with Github API request"
@@ -91,17 +91,17 @@ class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints 
 
     describe("fileExists") {
       it("should return true if the file exists in the given Github repo") {
-        val fileExists = githubManager.fileExists(repo = "some-repo", owner = "some-owner", path = "some/file")
+        val fileExists = githubConnector.fileExists(repo = "some-repo", owner = "some-owner", path = "some/file")
         fileExists should be(true)
       }
 
       it("should return false if the file doesn't exist") {
-        val fileExists = githubManager.fileExists(repo = "some-other-repo", owner = "some-owner", path = "some/file")
+        val fileExists = githubConnector.fileExists(repo = "some-other-repo", owner = "some-owner", path = "some/file")
         fileExists should be(false)
       }
 
       it("should default repo owner to hmrc") {
-        val fileExists = githubManager.fileExists(repo = "some-other-repo", path = "some/file")
+        val fileExists = githubConnector.fileExists(repo = "some-other-repo", path = "some/file")
         fileExists should be(true)
       }
 
@@ -110,10 +110,10 @@ class GithubManagerSpec extends AnyFunSpec with Matchers with WireMockEndpoints 
           override val apiToken        = "incorrect-token"
           override val baseUrl: String = endpointMockUrl
         }
-        val otherGithubManager                   = new GithubManager(incorrectConfig)
+        val otherGithubConnector                 = new GithubConnector(incorrectConfig)
 
         val thrown = intercept[Exception] {
-          otherGithubManager.fileExists(repo = "some-other-repo", path = "some/file")
+          otherGithubConnector.fileExists(repo = "some-other-repo", path = "some/file")
         }
 
         thrown.getMessage should startWith regex "Error with Github API request"

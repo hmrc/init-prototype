@@ -34,33 +34,33 @@ class PackageLockReportTaskSpec
     with AwaitSupport
     with BeforeAndAfterEach {
 
-  val mockGithubManager: GithubManager = mock[GithubManager]
-  val mockHerokuManager: HerokuManager = mock[HerokuManager]
+  val mockGithubConnector: GithubConnector = mock[GithubConnector]
+  val mockHerokuConnector: HerokuConnector = mock[HerokuConnector]
 
-  when(mockGithubManager.fileExists(any[String], any[String], any[String])).thenReturn(true)
+  when(mockGithubConnector.fileExists(any[String], any[String], any[String])).thenReturn(true)
 
   // first prototype does not exist in github
-  when(mockGithubManager.repoExists(is("first-prototype"), any[String])).thenReturn(false)
-  when(mockHerokuManager.getSlugIds(is("first-prototype"))).thenReturn(Future(Nil))
-  when(mockHerokuManager.getSlugIds(is("first-prototype"))).thenReturn(Future(Seq("slug1")))
-  when(mockHerokuManager.getCommitId(is("first-prototype"), is("slug1"))).thenReturn(Future(None))
+  when(mockGithubConnector.repoExists(is("first-prototype"), any[String])).thenReturn(false)
+  when(mockHerokuConnector.getSlugIds(is("first-prototype"))).thenReturn(Future(Nil))
+  when(mockHerokuConnector.getSlugIds(is("first-prototype"))).thenReturn(Future(Seq("slug1")))
+  when(mockHerokuConnector.getCommitId(is("first-prototype"), is("slug1"))).thenReturn(Future(None))
 
   // second prototype exists under a different repo name, but has no package.json or package-lock.json
-  when(mockGithubManager.repoExists(is("second-prototype"), any[String])).thenReturn(false)
-  when(mockHerokuManager.getSlugIds(is("second-prototype"))).thenReturn(Future(Seq("slug1", "slug2", "slug3")))
-  when(mockHerokuManager.getCommitId(is("second-prototype"), is("slug1"))).thenReturn(Future(None))
-  when(mockHerokuManager.getCommitId(is("second-prototype"), is("slug2"))).thenReturn(Future(Some("sha2")))
-  when(mockGithubManager.getGithubRepoName(is("sha2"))).thenReturn(None)
-  when(mockHerokuManager.getCommitId(is("second-prototype"), is("slug3"))).thenReturn(Future(Some("sha3")))
-  when(mockGithubManager.getGithubRepoName(is("sha3"))).thenReturn(Some("second-repo-name"))
-  when(mockGithubManager.fileExists(any[String], is("second-repo-name"), any[String])).thenReturn(false)
+  when(mockGithubConnector.repoExists(is("second-prototype"), any[String])).thenReturn(false)
+  when(mockHerokuConnector.getSlugIds(is("second-prototype"))).thenReturn(Future(Seq("slug1", "slug2", "slug3")))
+  when(mockHerokuConnector.getCommitId(is("second-prototype"), is("slug1"))).thenReturn(Future(None))
+  when(mockHerokuConnector.getCommitId(is("second-prototype"), is("slug2"))).thenReturn(Future(Some("sha2")))
+  when(mockGithubConnector.getGithubRepoName(is("sha2"))).thenReturn(None)
+  when(mockHerokuConnector.getCommitId(is("second-prototype"), is("slug3"))).thenReturn(Future(Some("sha3")))
+  when(mockGithubConnector.getGithubRepoName(is("sha3"))).thenReturn(Some("second-repo-name"))
+  when(mockGithubConnector.fileExists(any[String], is("second-repo-name"), any[String])).thenReturn(false)
 
   // third prototype is missing a package-lock.json
-  when(mockGithubManager.repoExists(is("third-prototype"), any[String])).thenReturn(true)
-  when(mockGithubManager.fileExists(is("package-lock.json"), is("third-prototype"), any[String])).thenReturn(false)
+  when(mockGithubConnector.repoExists(is("third-prototype"), any[String])).thenReturn(true)
+  when(mockGithubConnector.fileExists(is("package-lock.json"), is("third-prototype"), any[String])).thenReturn(false)
 
   // fourth prototype has a package-lock.json
-  when(mockGithubManager.repoExists(is("fourth-prototype"), any[String])).thenReturn(true)
+  when(mockGithubConnector.repoExists(is("fourth-prototype"), any[String])).thenReturn(true)
 
   val config = new PackageLockReportConfiguration {
     override val packageLockReportFile: String = "test-package-lock-report.txt"
@@ -72,7 +72,7 @@ class PackageLockReportTaskSpec
 
   describe("PackageLockReportTask") {
 
-    val reportTask = new PackageLockReportTask(mockHerokuManager, mockGithubManager, config)
+    val reportTask = new PackageLockReportTask(mockHerokuConnector, mockGithubConnector, config)
 
     describe("generateReport") {
 
