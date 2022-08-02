@@ -1,0 +1,31 @@
+{
+  "id" : "0b5dce8a-fe72-3028-8520-8bfff1adf03a",
+  "request" : {
+    "urlPattern" : "/apps/app-with-11-release-slugs/releases/",
+    "method" : "GET",
+    "headers" : {
+      "Authorization" : {
+        "equalTo" : "Bearer dummy-token"
+      },
+      "Range" : {
+        "equalTo" : ";max=1000;"
+      }
+    }
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-apps-any-app-releases-slugs.json",
+    "headers" : {
+      "Accept-Ranges" : "uuid, version",
+      "Cache-Control" : "private, no-cache",
+      "Content-Range" : "version 201..332",
+      "Content-Type" : "application/json",
+      "Oauth-Scope" : "global",
+      "Oauth-Scope-Accepted" : "global read-protected write-protected",
+      "Ratelimit-Multiplier" : "1",
+      "Ratelimit-Remaining" : "4499",
+      "Vary" : "Authorization,Accept-Encoding"
+    }
+  },
+  "uuid" : "0b5dce8a-fe72-3028-8520-8bfff1adf03a"
+}

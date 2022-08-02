@@ -24,7 +24,7 @@ class HerokuConfiguration {
   private val config: Config           = ConfigFactory.load()
   val baseUrl: String                  = config.getString("heroku.baseUrl")
   val apiToken: String                 = config.getString("heroku.apiToken")
-  val timeout: Duration                = Duration(config.getInt("heroku.timeoutMs"), MILLISECONDS)
+  val jobTimeout: Duration             = Duration(config.getInt("heroku.jobTimeoutMs"), MILLISECONDS)
   val connTimeoutMs: Int               = config.getInt("heroku.connTimeoutMs")
   val readTimeoutMs: Int               = config.getInt("heroku.readTimeoutMs")
   val administratorEmails: Seq[String] = config.getStringList("heroku.administratorEmails").asScala

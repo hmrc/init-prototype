@@ -39,8 +39,8 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
         Future.successful(
           (
             Seq(
-              HerokuRelease("2019-12-01", "First release", "gerald@example.com"),
-              HerokuRelease("2019-12-02", "Second release", "john@example.com")
+              HerokuRelease(1, "gerald@example.com", "2019-12-01", "First release", None),
+              HerokuRelease(2, "john@example.com", "2019-12-02", "Second release", None)
             ),
             None
           )
@@ -51,8 +51,8 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
         Future.successful(
           (
             Seq(
-              HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
-              HerokuRelease("2019-12-04", "Second release", "john@example.com")
+              HerokuRelease(1, "gerald@example.com", "2019-12-03", "First release", None),
+              HerokuRelease(2, "john@example.com", "2019-12-04", "Second release", None)
             ),
             None
           )
@@ -87,9 +87,9 @@ class HerokuReportSpec extends AnyFunSpec with Matchers with MockitoSugar with A
             Future.successful(
               (
                 Seq(
-                  HerokuRelease("2019-12-03", "First release", "gerald@example.com"),
-                  HerokuRelease("2019-12-04", "Second release", "john@example.com"),
-                  HerokuRelease("2020-02-01", "Admin release", "admin@example.com")
+                  HerokuRelease(1, "gerald@example.com", "2019-12-03", "First release", None),
+                  HerokuRelease(2, "john@example.com", "2019-12-04", "Second release", None),
+                  HerokuRelease(3, "admin@example.com", "2020-02-01", "Admin release", None)
                 ),
                 None
               )

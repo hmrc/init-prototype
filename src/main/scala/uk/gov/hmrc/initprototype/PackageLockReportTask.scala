@@ -16,29 +16,24 @@
 
 package uk.gov.hmrc.initprototype
 
-import java.io.{File, PrintWriter}
+import java.io.PrintWriter
+import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, Future}
 import scala.io.Source
 import scala.util.{Success, Try}
 
 case class PackageLockReportTask(
-  downloader: GithubRepositoryDownloader,
+  herokuManager: HerokuManager,
+  githubManager: GithubManager,
   conf: PackageLockReportConfiguration
 ) {
 
-  def checkoutAndReport(args: Array[String]): Future[Unit] = Future {
-    val directory        = ensurePrototypesDirectory(conf.prototypesDirectory)
+  def generateReport(): Future[Unit] = Future {
     val herokuPrototypes = parseHerokuUsageReport()
-    downloader.checkoutRepositories(herokuPrototypes.map(_.prototypeName), conf.prototypesDirectory)
-    generatePackageLockReport(herokuPrototypes, directory)
-  }
-
-  private def ensurePrototypesDirectory(directoryName: String): File = {
-    val directory = new File((os.pwd / directoryName).toString())
-    if (!directory.exists()) directory.mkdir()
-    directory
+    val enrichedRows     = resolveGithubRepos(herokuPrototypes)
+    writeRowsToFile(enrichedRows)
   }
 
   private def parseHerokuUsageReport(): List[ReportRow] =
@@ -61,6 +56,7 @@ case class PackageLockReportTask(
       val numberOfInstances = input.split("\t")(3).toInt
       ReportRow(
         prototypeName = name,
+        repoName = None,
         containsPackageJson = None,
         containsPackageLockJson = None,
         deployedToHeroku = Some(true),
@@ -74,54 +70,66 @@ case class PackageLockReportTask(
         None
     }
 
-  private def parseLocalGithubRepos(repositories: List[File]): List[ReportRow] =
-    repositories.flatMap { repository =>
-      if (repository.isDirectory) {
-        val repositoryContents: List[String] = repository.listFiles().toList.map(_.getName)
-        Some(
-          ReportRow(
-            prototypeName = repository.getName,
-            containsPackageJson = Some(repositoryContents.contains("package.json")),
-            containsPackageLockJson = Some(repositoryContents.contains("package-lock.json")),
-            deployedToHeroku = None,
-            runningInHeroku = None,
+  private def resolveGithubRepos(herokuPrototypes: List[ReportRow]): List[ReportRow] =
+    herokuPrototypes.map { herokuData =>
+      val githubRepoExistsWithSameName = githubManager.repoExists(herokuData.prototypeName)
+      val gitHubRepo                   = if (githubRepoExistsWithSameName) {
+        Some(herokuData.prototypeName)
+      } else {
+        getGithubRepoFromHerokuApp(herokuData.prototypeName)
+      }
+
+      gitHubRepo match {
+        case None       => herokuData
+        case Some(repo) =>
+          val hasPackageJson     = githubManager.fileExists("package.json", repo)
+          val hasPackageLockJson = githubManager.fileExists("package-lock.json", repo)
+          herokuData.copy(
+            repoName = gitHubRepo,
+            containsPackageJson = Some(hasPackageJson),
+            containsPackageLockJson = Some(hasPackageLockJson),
             inGithub = Some(true)
           )
-        )
-      } else {
-        None
       }
     }
 
-  private def generatePackageLockReport(herokuPrototypes: List[ReportRow], directory: File): Unit = {
-    val repositories: List[File] = directory.listFiles().toList
-    val githubRepositories       = parseLocalGithubRepos(repositories)
-    writeRowsToFile(combineLists(githubRepositories, herokuPrototypes))
+  def getGithubRepoFromHerokuApp(appName: String): Option[String] = {
+    val eventualRepoName = for {
+      slugIds <- herokuManager.getSlugIds(appName)
+      repoName = getNameFromSlugIds(appName, slugIds)
+    } yield repoName
+    Await.result(eventualRepoName, Duration.Inf)
   }
 
-  private def combineLists(githubRepos: List[ReportRow], herokuPrototypes: List[ReportRow]): List[ReportRow] = {
-    val updatedGithubRepos = githubRepos.map { githubRepo =>
-      herokuPrototypes.find(_.prototypeName == githubRepo.prototypeName) match {
-        case Some(matchingHerokuRow) =>
-          githubRepo.copy(
-            deployedToHeroku = Some(true),
-            runningInHeroku = matchingHerokuRow.runningInHeroku
-          )
-        case _                       => githubRepo
-      }
+  private def getNameFromSlugIds(appName: String, slugIds: Seq[String]): Option[String] = {
+    @tailrec
+    def getNameFromId(ids: Seq[String]): Option[String] = ids.toList match {
+      case Nil          => None
+      case head :: tail =>
+        Await.result(herokuManager.getCommitId(appName, head), Duration.Inf) match {
+          case Some(commitSha) =>
+            githubManager.getGithubRepoName(commitSha) match {
+              case Some(repoName) => Some(repoName)
+              case None           => getNameFromId(tail)
+            }
+          case None            => getNameFromId(tail)
+        }
     }
 
-    val remainingHerokuRows =
-      herokuPrototypes.filterNot(hr => githubRepos.map(_.prototypeName).contains(hr.prototypeName))
-    val updatedHerokuRows   = remainingHerokuRows.map(_.copy(inGithub = Some(false)))
-
-    (updatedGithubRepos ++ updatedHerokuRows).sortBy(_.prototypeName)
+    getNameFromId(slugIds.distinct)
   }
 
-  private def writeRowsToFile(rows: List[ReportRow]) = {
+  private def writeRowsToFile(rows: List[ReportRow]): Unit = {
     val printWriter     = new PrintWriter((os.pwd / conf.packageLockReportFile).toString())
-    val headerRow       =
-      s"prototypeName\tcontainsPackageJson\tcontainsPackageLockJson\tdeployedToHeroku\trunningInHeroku\tinGitHub"
+    val headerRow       = List(
+      "prototypeName",
+      "githubRepoName",
+      "containsPackageJson",
+      "containsPackageLockJson",
+      "deployedToHeroku",
+      "runningInHeroku",
+      "inGitHub"
+    ).mkString("\t")
     val allRowsAsString = (List(headerRow) ++ rows.map(_.toString)).mkString("\n")
     printWriter.print(allRowsAsString)
     printWriter.close()
@@ -130,6 +138,7 @@ case class PackageLockReportTask(
 
 case class ReportRow(
   prototypeName: String,
+  repoName: Option[String],
   containsPackageJson: Option[Boolean],
   containsPackageLockJson: Option[Boolean],
   deployedToHeroku: Option[Boolean],
@@ -138,9 +147,15 @@ case class ReportRow(
 ) {
 
   override def toString: String =
-    s"$prototypeName\t${getOrDefault(containsPackageJson)}\t${getOrDefault(containsPackageLockJson)}\t${getOrDefault(
-      deployedToHeroku
-    )}\t${getOrDefault(runningInHeroku)}\t${getOrDefault(inGithub)}"
+    List(
+      prototypeName,
+      repoName.getOrElse("unknown"),
+      getOrDefault(containsPackageJson),
+      getOrDefault(containsPackageLockJson),
+      getOrDefault(deployedToHeroku),
+      getOrDefault(runningInHeroku),
+      getOrDefault(inGithub)
+    ).mkString("\t")
 
   private def getOrDefault(optBool: Option[Boolean]): String = {
     val default = "unknown"
@@ -149,10 +164,9 @@ case class ReportRow(
 }
 
 object PackageLockReportTask extends App {
-  implicit val ec: ExecutionContext  = ExecutionContext.global
-  val githubRepositoryDownloader     = new GithubRepositoryDownloader()
-  val packageLockReportConfiguration = new PackageLockReportConfiguration()
-  val packageLockReportTask          = new PackageLockReportTask(githubRepositoryDownloader, packageLockReportConfiguration)
+  val herokuManager: HerokuManager = new HerokuManager(new HerokuConfiguration)
+  val githubManager: GithubManager = new GithubManager(new GithubConfiguration)
+  val packageLockReportTask        = new PackageLockReportTask(herokuManager, githubManager, PackageLockReportConfiguration())
 
-  Await.result(packageLockReportTask.checkoutAndReport(args), Duration.Inf)
+  Await.result(packageLockReportTask.generateReport(), Duration.Inf)
 }

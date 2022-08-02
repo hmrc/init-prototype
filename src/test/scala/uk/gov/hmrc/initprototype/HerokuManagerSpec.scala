@@ -38,12 +38,13 @@ class HerokuManagerSpec
     val herokuManager = new HerokuManager(config)
 
     describe("getAppNames") {
-      it("should get all the apps") {
+      it("should get all the apps, paginating if required") {
         val apps: Seq[String] = await(herokuManager.getAppNames)
 
-        apps.size should be > 1
+        apps.size should be(3)
         apps.head should equal("my-app")
         apps(1)   should equal("my-other-app")
+        apps(2)   should equal("yet-another-app")
       }
 
       it("should throw an error if the server responds with a 401") {
@@ -232,5 +233,23 @@ class HerokuManagerSpec
         endpointServer.verify(patchRequestedFor(urlEqualTo("/apps/my-other-app/formation/web")))
       }
     }
+
+    describe("getSlugIds") {
+      it("should get the first 10 slug ids associated with releases for the given app, in ascending version order") {
+        val slugIds = await(herokuManager.getSlugIds("app-with-11-release-slugs"), 10 second)
+
+        slugIds.size should be(10)
+        slugIds.head should equal("First slug")
+        slugIds(9)   should equal("Tenth slug")
+      }
+    }
+
+    describe("getCommitId") {
+      it("should get the commit id associated with the given application slug") {
+        val maybeSlugId = await(herokuManager.getCommitId("some-app", "some-slug"), 10 second)
+        maybeSlugId should be(Some("some-commit-id"))
+      }
+    }
+
   }
 }

@@ -29,6 +29,8 @@ class HerokuManager(config: HerokuConfiguration)(implicit ec: ExecutionContext) 
     "Accept"        -> "application/vnd.heroku+json; version=3"
   )
 
+  private val DEFAULT_RANGE_HEADER = ";max=1000;"
+
   private def herokuRequest(
     url: String,
     method: String = "GET",
@@ -61,18 +63,32 @@ class HerokuManager(config: HerokuConfiguration)(implicit ec: ExecutionContext) 
       }
     }
 
-  private def getApps: Future[Seq[HerokuApp]] = herokuRequest("/apps/") map { case (responseBody: String, _, _) =>
-    Json.parse(responseBody).as[Seq[HerokuApp]]
+  private def getApps(
+    accumulator: Seq[HerokuApp] = Seq.empty,
+    range: Option[String] = None
+  ): Future[Seq[HerokuApp]] =
+    getAppsFromRange(range) flatMap { case (apps, maybeNextRange) =>
+      val combinedApps = accumulator ++ apps
+      maybeNextRange match {
+        case None            => Future(combinedApps)
+        case Some(nextRange) => getApps(accumulator = combinedApps, Some(nextRange))
+      }
+    }
+
+  private def getAppsFromRange(range: Option[String]): Future[(Seq[HerokuApp], Option[String])] = {
+    val rangeHeader = Map("Range" -> range.getOrElse(DEFAULT_RANGE_HEADER))
+    herokuRequest("/apps/", additionalHeaders = rangeHeader) map { case (body, _, headers) =>
+      val apps      = Json.parse(body).as[Seq[HerokuApp]]
+      val nextRange = headers.get("next-range").flatMap(_.headOption)
+      (apps, nextRange)
+    }
   }
 
-  def getAppNames: Future[Seq[String]] = getApps.map { apps =>
-    val appNames: Seq[String] = for (app <- apps) yield app.name
-    appNames.sorted
-  }
+  def getAppNames: Future[Seq[String]] = getApps().map(_.map(_.name).sorted)
 
   def getAppReleasesFromRange(app: String, range: Option[String]): Future[(Seq[HerokuRelease], Option[String])] = {
     val url         = s"/apps/$app/releases/"
-    val rangeHeader = Map("Range" -> range.getOrElse(";max=1000;"))
+    val rangeHeader = Map("Range" -> range.getOrElse(DEFAULT_RANGE_HEADER))
 
     herokuRequest(url, additionalHeaders = rangeHeader) flatMap { case (body, _, headers) =>
       Json.parse(body).validate[Seq[HerokuRelease]] match {
@@ -117,4 +133,16 @@ class HerokuManager(config: HerokuConfiguration)(implicit ec: ExecutionContext) 
       Json.parse(responseBody).as[HerokuFormation]
     }
   }
+
+  def getSlugIds(appName: String): Future[Seq[String]] =
+    getAppReleases(appName, range = None) map { case (releases, _) =>
+      val orderedByVersion = releases.sortBy(_.version)
+      orderedByVersion.flatMap(_.slugId).take(10)
+    }
+
+  def getCommitId(appName: String, slugId: String): Future[Option[String]] =
+    herokuRequest(url = s"/apps/$appName/slugs/$slugId") map { response =>
+      val asJson = Json.parse(response._1)
+      (asJson \ "commit").asOpt[String]
+    }
 }

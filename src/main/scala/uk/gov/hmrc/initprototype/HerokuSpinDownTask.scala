@@ -42,5 +42,5 @@ object HerokuSpinDownTask extends App {
   val herokuManager: HerokuManager             = new HerokuManager(herokuConfiguration)
   val herokuTask                               = new HerokuSpinDownTask(herokuManager)
 
-  Await.result(herokuTask.spinDownAppsFromFiles(args), herokuConfiguration.timeout)
+  Await.result(herokuTask.spinDownAppsFromFiles(args), herokuConfiguration.jobTimeout)
 }

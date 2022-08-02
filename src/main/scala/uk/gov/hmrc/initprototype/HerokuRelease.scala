@@ -15,15 +15,34 @@
  */
 
 package uk.gov.hmrc.initprototype
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
-case class HerokuRelease(createdAt: String, description: String, email: String)
+import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue, Reads}
+
+import scala.util.{Success, Try}
+
+case class HerokuRelease(
+  version: Int,
+  userEmail: String,
+  createdAt: String,
+  description: String,
+  slugId: Option[String]
+)
 
 object HerokuRelease {
-  implicit val herokuReleaseReads: Reads[HerokuRelease] = (
-    (JsPath \ "created_at").read[String] and
-      (JsPath \ "description").read[String] and
-      (JsPath \ "user" \ "email").read[String]
-  )(HerokuRelease.apply _)
+  implicit def reads: Reads[HerokuRelease] = new Reads[HerokuRelease] {
+    override def reads(json: JsValue): JsResult[HerokuRelease] = {
+      val maybeAppRelease = Try {
+        val version: Int           = (json \ "version").as[Int]
+        val userEmail: String      = (json \ "user" \ "email").as[String]
+        val slugId: Option[String] = (json \ "slug" \ "id").asOpt[String]
+        val createdAt              = (json \ "created_at").as[String]
+        val description            = (json \ "description").as[String]
+        HerokuRelease(version, userEmail, createdAt, description, slugId)
+      }
+      maybeAppRelease match {
+        case Success(release) => JsSuccess(release)
+        case _                => JsError("Could not parse as HerokuAppRelease")
+      }
+    }
+  }
 }
