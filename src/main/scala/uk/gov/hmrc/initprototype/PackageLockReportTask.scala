@@ -25,8 +25,8 @@ import scala.io.Source
 import scala.util.{Success, Try}
 
 case class PackageLockReportTask(
-  herokuManager: HerokuManager,
-  githubManager: GithubManager,
+  herokuManager: HerokuConnector,
+  githubManager: GithubConnector,
   conf: PackageLockReportConfiguration
 ) {
 
@@ -164,9 +164,9 @@ case class ReportRow(
 }
 
 object PackageLockReportTask extends App {
-  val herokuManager: HerokuManager = new HerokuManager(new HerokuConfiguration)
-  val githubManager: GithubManager = new GithubManager(new GithubConfiguration)
-  val packageLockReportTask        = new PackageLockReportTask(herokuManager, githubManager, PackageLockReportConfiguration())
+  val herokuManager: HerokuConnector = new HerokuConnector(new HerokuConfiguration)
+  val githubManager: GithubConnector = new GithubConnector(new GithubConfiguration)
+  val packageLockReportTask          = new PackageLockReportTask(herokuManager, githubManager, PackageLockReportConfiguration())
 
   Await.result(packageLockReportTask.generateReport(), Duration.Inf)
 }

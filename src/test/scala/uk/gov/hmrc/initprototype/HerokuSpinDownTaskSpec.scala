@@ -33,22 +33,22 @@ class HerokuSpinDownTaskSpec
     with MockitoSugar
     with AwaitSupport
     with BeforeAndAfterEach {
-  val mockManager: HerokuManager = mock[HerokuManager]
+  val mockHerokuConnector: HerokuConnector = mock[HerokuConnector]
 
-  override def beforeEach: Unit = reset(mockManager)
+  override def beforeEach: Unit = reset(mockHerokuConnector)
 
   describe("HerokuSpinDownTask") {
-    val herokuTask = new HerokuSpinDownTask(mockManager)
+    val herokuTask = new HerokuSpinDownTask(mockHerokuConnector)
 
     describe("spinDownApps") {
       it("should set the dyno count of the given app to zero") {
-        when(mockManager.spinDownApp(anyString()))
+        when(mockHerokuConnector.spinDownApp(anyString()))
           .thenReturn(Future.successful(HerokuFormation("Standard-1X", 0, HerokuApp("my-app"))))
 
         await(herokuTask.spinDownApps(Seq("my-test-app", "my-other-app")))
 
-        verify(mockManager).spinDownApp("my-other-app")
-        verify(mockManager).spinDownApp("my-test-app")
+        verify(mockHerokuConnector).spinDownApp("my-other-app")
+        verify(mockHerokuConnector).spinDownApp("my-test-app")
       }
 
       def createAppsFile(apps: Seq[String]): String = {
@@ -66,26 +66,26 @@ class HerokuSpinDownTaskSpec
 
       it("should read from a file") {
         val appsFile = createAppsFile(Seq("app-one", "app-two"))
-        when(mockManager.spinDownApp(anyString()))
+        when(mockHerokuConnector.spinDownApp(anyString()))
           .thenReturn(Future.successful(HerokuFormation("Standard-1X", 0, HerokuApp("my-app"))))
 
         await(herokuTask.spinDownAppsFromFile(appsFile))
 
-        verify(mockManager).spinDownApp("app-one")
-        verify(mockManager).spinDownApp("app-two")
+        verify(mockHerokuConnector).spinDownApp("app-one")
+        verify(mockHerokuConnector).spinDownApp("app-two")
       }
 
       it("should read from multiple files") {
         val appsFileOne = createAppsFile(Seq("app-one"))
         val appsFileTwo = createAppsFile(Seq("app-two"))
 
-        when(mockManager.spinDownApp(anyString()))
+        when(mockHerokuConnector.spinDownApp(anyString()))
           .thenReturn(Future.successful(HerokuFormation("Standard-1X", 0, HerokuApp("my-app"))))
 
         await(herokuTask.spinDownAppsFromFiles(Seq(appsFileOne, appsFileTwo)))
 
-        verify(mockManager).spinDownApp("app-one")
-        verify(mockManager).spinDownApp("app-two")
+        verify(mockHerokuConnector).spinDownApp("app-one")
+        verify(mockHerokuConnector).spinDownApp("app-two")
       }
     }
   }

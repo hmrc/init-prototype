@@ -20,7 +20,7 @@ import scalaj.http.{Http, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future, blocking}
 
-class HerokuManager(config: HerokuConfiguration)(implicit ec: ExecutionContext) {
+class HerokuConnector(config: HerokuConfiguration)(implicit ec: ExecutionContext) {
   import config._
 
   private val requestHeaders = Map(

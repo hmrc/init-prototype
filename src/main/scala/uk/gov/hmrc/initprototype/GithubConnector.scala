@@ -21,9 +21,8 @@ import scalaj.http.{Http, HttpResponse}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future, blocking}
-import scala.util.{Success, Try}
 
-class GithubManager(config: GithubConfiguration)(implicit ec: ExecutionContext) {
+class GithubConnector(config: GithubConfiguration)(implicit ec: ExecutionContext) {
 
   import config._
 

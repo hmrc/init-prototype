@@ -21,7 +21,7 @@ import java.io.File
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: HerokuConfiguration)(implicit
+class HerokuReportTask(herokuManager: HerokuConnector, herokuConfiguration: HerokuConfiguration)(implicit
   executionContext: ExecutionContext
 ) {
   import herokuManager._
@@ -70,7 +70,7 @@ class HerokuReportTask(herokuManager: HerokuManager, herokuConfiguration: Heroku
 object HerokuReportTask extends App {
   implicit val ec: ExecutionContext            = ExecutionContext.global
   val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration
-  val herokuManager: HerokuManager             = new HerokuManager(herokuConfiguration)
+  val herokuManager: HerokuConnector           = new HerokuConnector(herokuConfiguration)
   val herokuTask                               = new HerokuReportTask(herokuManager, herokuConfiguration)
 
   Await.result(herokuTask.getAppsReleases(args), herokuConfiguration.jobTimeout)

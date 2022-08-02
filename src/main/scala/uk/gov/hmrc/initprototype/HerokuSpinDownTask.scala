@@ -19,7 +19,7 @@ package uk.gov.hmrc.initprototype
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.io.Source
 
-class HerokuSpinDownTask(herokuManager: HerokuManager)(implicit ec: ExecutionContext) {
+class HerokuSpinDownTask(herokuManager: HerokuConnector)(implicit ec: ExecutionContext) {
 
   def spinDownApps(apps: Seq[String]): Future[Seq[HerokuFormation]] = Future.sequence(
     apps.map(herokuManager.spinDownApp)
@@ -39,7 +39,7 @@ class HerokuSpinDownTask(herokuManager: HerokuManager)(implicit ec: ExecutionCon
 object HerokuSpinDownTask extends App {
   implicit val ec: ExecutionContext            = ExecutionContext.global
   val herokuConfiguration: HerokuConfiguration = new HerokuConfiguration
-  val herokuManager: HerokuManager             = new HerokuManager(herokuConfiguration)
+  val herokuManager: HerokuConnector           = new HerokuConnector(herokuConfiguration)
   val herokuTask                               = new HerokuSpinDownTask(herokuManager)
 
   Await.result(herokuTask.spinDownAppsFromFiles(args), herokuConfiguration.jobTimeout)
