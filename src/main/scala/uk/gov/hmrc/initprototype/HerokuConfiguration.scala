@@ -23,7 +23,11 @@ import scala.collection.JavaConverters._
 class HerokuConfiguration {
   private val config: Config           = ConfigFactory.load()
   val baseUrl: String                  = config.getString("heroku.baseUrl")
-  val apiToken: String                 = config.getString("heroku.apiToken")
+  val apiToken: String                 = if (config.hasPath("heroku.apiToken")) {
+    config.getString("heroku.apiToken")
+  } else {
+    HerokuAuthToken.fromHerokuCli
+  }
   val jobTimeout: Duration             = Duration(config.getInt("heroku.jobTimeoutMs"), MILLISECONDS)
   val connTimeoutMs: Int               = config.getInt("heroku.connTimeoutMs")
   val readTimeoutMs: Int               = config.getInt("heroku.readTimeoutMs")
