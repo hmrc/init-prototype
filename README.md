@@ -11,7 +11,7 @@ prototyping environment on Heroku.
 To use the Heroku build tasks, you will need:
 * a Heroku account linked to your HMRC email address
 * be a member and have admin access to the HMRC team
-* a Heroku API Key generated on the [Heroku 'Manage Account' settings page](https://dashboard.heroku.com/account)
+* have the heroku cli installed locally, or have a Heroku API Key generated from the [Heroku 'Manage Account' settings page](https://dashboard.heroku.com/account)
 
 ## Github prerequisites
 
@@ -26,7 +26,7 @@ in Heroku. The report lists the prototypes, their sizes, when they were first cr
 To run this task, having cloned the repository and changed to the repository root directory,
 
 ```shell script
-sbt -Dheroku.apiToken=REPLACE_WITH_HEROKU_API_KEY "generateHerokuReport report.txt"
+sbt "generateHerokuReport report.txt"
 ```
 
 This generates a tab-separated plain text file, report.txt, in the repository root directory that can
@@ -50,7 +50,7 @@ prototype-three
 Save this file into the root directory of this repository. Then run:
 
 ```shell script
-sbt -Dheroku.apiToken=REPLACE_WITH_HEROKU_API_KEY "spinDownHerokuApps spin-down-list.txt"
+sbt "spinDownHerokuApps spin-down-list.txt"
 ```
 
 You should get a report similar to:
@@ -125,7 +125,7 @@ The sbt task `generatePackageLockReport` can produce a report of which Github re
 The output will be saved to `package-lock-analysis.tsv`.
 
 ```shell script
-sbt -Dheroku.apiToken=REPLACE_WITH_HEROKU_API_KEY -Dheroku.apiToken=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN "generateHerokuReport report.txt"
+sbt -Dgithub.apiToken=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN "generateHerokuReport report.txt"
 sbt generatePackageLockReport
 ```
 
