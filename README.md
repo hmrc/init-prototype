@@ -38,8 +38,26 @@ in [application.conf](src/main/resources/application.conf)
 
 ## Spinning down Heroku prototypes
 
-To spin down multiple prototypes, create a plain text file, e.g. spin-down-list.txt,
-with the name of each prototype on a new line e.g.
+Spinning down a prototype turns it off by reducing its dyno count to 0. A spun down prototype can be turned on again by
+increasing its dyno count to 1. A dyno represents one running instance of your application on heroku. 
+
+We need to periodically spin down unused prototypes because we have a monthly resource quota for the hmrc heroku account
+that we sometimes overrun. Before we turn off a prototype, we give notice via the community-prototype channel on slack 
+so users can opt to keep their prototype running.
+
+### Generate a list of currently running candidates for spinning down
+
+The `generateSpinDownList` sbt task creates a list of prototypes that have not been updated in the last 84 days, and are
+not present in the `heroku.appsToKeepRunning` list. It outputs to the text file `spin-down-list.txt`, this file can then
+be manually edited to remove an application if requested, and if you re-run the sbt task with an existing spin down list
+present then it will automatically update the list to remove prototypes that have been updated since the list was
+created or added to the `heroku.appsToKeepRunning` list. It will not add newly inactive prototypes to the list. If you 
+want to generate a new list, you will need to remove or empty the existing spin down list. The task will notify you in 
+the console when it is performing an update rather than creating a new spin down list.
+
+### Spin down list of heroku apps by name
+
+The `spinDownHerokuApps` sbt task accepts a file with the names of heroku apps you want to spin down. For example:
 
 ```text
 prototype-one
@@ -47,7 +65,10 @@ prototype-two
 prototype-three
 ```
 
-Save this file into the root directory of this repository. Then run:
+> **Note**
+> You can generate a list of candidate heroku applications for spinning down that might be no longer in use by running
+> the `generateSpinDownList` sbt
+> task, [see the previous section for more information](#generate-a-list-of-currently-running-candidates-for-spinning-down).
 
 ```shell script
 sbt "spinDownHerokuApps spin-down-list.txt"
