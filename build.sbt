@@ -22,3 +22,7 @@ fullRunInputTask(generateHerokuReport, Compile, "uk.gov.hmrc.initprototype.Herok
 
 val generatePackageLockReport = inputKey[Unit]("Generates a report of prototypes' package-lock.json")
 fullRunInputTask(generatePackageLockReport, Compile, "uk.gov.hmrc.initprototype.PackageLockReportTask")
+
+val generateSpinDownList =
+  inputKey[Unit]("Generate a spin-down-list.txt of heroku apps that might not be being used and could be turned off")
+fullRunInputTask(generateSpinDownList, Compile, "uk.gov.hmrc.initprototype.HerokuGenerateSpinDownListTask")
