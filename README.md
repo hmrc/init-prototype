@@ -42,8 +42,12 @@ Spinning down a prototype turns it off by reducing its dyno count to 0. A spun d
 increasing its dyno count to 1. A dyno represents one running instance of your application on heroku. 
 
 We need to periodically spin down unused prototypes because we have a monthly resource quota for the hmrc heroku account
-that we sometimes overrun. Before we turn off a prototype, we give notice via the community-prototype channel on slack 
+that we sometimes overrun. Before we turn off a prototype, we give notice via the community-prototype channel on slack
 so users can opt to keep their prototype running.
+
+The sections below document the tasks used as part of the spin down process, if you're performing a spin down you can
+find the complete sequence of steps in the
+runbook [how to spin down idle heroku apps](./docs/maintainers/runbooks/how-to-spin-down-idle-heroku-apps.md).
 
 ### Generate a list of currently running candidates for spinning down
 
