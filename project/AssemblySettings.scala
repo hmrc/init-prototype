@@ -5,18 +5,18 @@ import sbtassembly._
 
 object AssemblySettings {
   def apply() = Seq(
-    assemblyJarName in assembly := "init-prototype.jar",
-    mainClass in assembly := Some("uk.gov.hmrc.initprototype.Main"),
-    assemblyMergeStrategy in assembly := {
+    assembly / assemblyJarName := "init-prototype.jar",
+    assembly / mainClass := Some("uk.gov.hmrc.initprototype.Main"),
+    assembly / assemblyMergeStrategy := {
       case "module-info.class"                                      => MergeStrategy.discard
       case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.first
       case PathList("play", "core", "server", xs @ _*)              => MergeStrategy.first
       case x                                                        =>
-        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        val oldStrategy = (assembly / assemblyMergeStrategy).value
         oldStrategy(x)
     },
-    artifact in (Compile, assembly) := {
-      val art = (artifact in (Compile, assembly)).value
+    Compile / assembly / artifact := {
+      val art = (Compile / assembly / artifact).value
       art.withClassifier(Some("assembly"))
     }
   )
