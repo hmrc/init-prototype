@@ -11,7 +11,7 @@ lazy val InitPrototype = Project(libName, file("."))
     resolvers += Resolver.typesafeRepo("releases"),
     AssemblySettings(),
     parallelExecution := false,
-    addArtifact(artifact in (Compile, assembly), assembly)
+    addArtifact(Compile / assembly / artifact, assembly)
   )
 
 val spinDownHerokuApps = inputKey[Unit]("Spin down the heroku apps listed in the given file.")
