@@ -59,7 +59,7 @@ On the spin down date planned in step 1 (normally a week after the initial annou
 2. Run `sbt generateSpinDownList` to update your spin-down-list.txt to additionally remove any prototypes from the list
    which were updated during the week
 
-3. Run `sbt spinDownPrototypes spin-down-list.txt` to turn off the remaining prototypes
+3. Run `sbt "spinDownHerokuApps spin-down-list.txt"` to turn off the remaining prototypes
 
 4. Post into the previous thread on slack, setting it to "[x] Also send to #community-prototype "
 
@@ -71,8 +71,7 @@ On the spin down date planned in step 1 (normally a week after the initial annou
    > {{attachment:spin-down-list.txt}}
 
 5. Make sure that any PR on `hmrc/init-prototype` repo to add new prototypes that should always be kept running is
-   merged before you
-   complete the spin down
+   merged before you complete the spin down
 
 
 
