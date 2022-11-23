@@ -27,7 +27,8 @@ object PrototypeKitReleaseUrlResolver {
   def getLatestZipballUrl(repoApiUrl: String, token: Option[String] = None): Either[ErrorMessage, ZipBallUrl] = {
     require(!repoApiUrl.endsWith("/"), s"repository api url should not end '/': $repoApiUrl")
 
-    val latestReleaseUrl = s"$repoApiUrl/releases/latest"
+    val latestReleaseUrl =
+      s"$repoApiUrl/releases/tags/v12.3.0" // pinned because prototype creation in v13 is now via an npx command rather than copying the repo as a template
 
     val headers                        = Seq(
       "content-type" -> "application/json"

@@ -1,5 +1,8 @@
 # init-prototype
 
+> **Note**
+> new prototype creation is current pinned at v12.3.0 of the govuk-prototype kit because from v13 creation is now via an npx command rather than copying the repo as a template. Work in progress to support v13 is happening under PLATUI-2102.
+
 This is an SBT library for building Gov.UK Design System prototypes. It is used as part 
 of the HMRC CI/CD environment.
 
@@ -37,6 +40,9 @@ changed or additional email addresses added to this exclude list by modifying th
 in [application.conf](src/main/resources/application.conf)
 
 ## Spinning down Heroku prototypes
+
+> **Note**
+> With the introduction of the prototype auto-publish functionality we now automatically delete prototypes from heroku after 90 days unless they are listed as a protected prototype in the B&D API. So the current spin down approach is somewhat superseded by that, and in the future we may explore additional automated idling of running prototypes not being actively used. If you want to add a prototype to the list of protected prototypes, ask in #team-plat-ui on slack.
 
 Spinning down a prototype turns it off by reducing its dyno count to 0. A spun down prototype can be turned on again by
 increasing its dyno count to 1. A dyno represents one running instance of your application on heroku. 
