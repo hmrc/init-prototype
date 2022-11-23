@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 
 class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoints with Matchers with EitherValues {
 
-  private final val releaseURL: String = "/releases/latest"
+  private final val releaseURL: String = "/releases/tags/v12.3.0"
 
   describe("Latest zip url") {
     it("should be correctly extracted from the response json from github") {
