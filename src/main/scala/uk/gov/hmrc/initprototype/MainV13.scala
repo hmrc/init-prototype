@@ -87,6 +87,7 @@ object MainV13 {
     val localRepoPath     = new File(tempDirectoryPath.toString).toPath.resolve(config.targetRepoName)
 
     val localPrototypeKitPath = new File(tempDirectoryPath.toString).toPath.resolve("govuk-prototype-kit")
+    localPrototypeKitPath.toFile.mkdir()
     %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
 
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
