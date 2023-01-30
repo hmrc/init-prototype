@@ -82,10 +82,14 @@ object MainV13 {
   def start(config: Config): Unit = {
     val credentials = GithubCredentials(config.githubUsername, config.githubToken)
 
-    val tempPath      = FileUtils.getTempDirectory.toPath
-    gitClone(tempPath.toString, config, credentials.token)
-    val localRepoPath = new File(tempPath.toString).toPath.resolve(config.targetRepoName)
-    %('npx, "govuk-prototype-kit", "create")(Path(localRepoPath))
+    val tempDirectoryPath      = FileUtils.getTempDirectory.toPath
+    gitClone(tempDirectoryPath.toString, config, credentials.token)
+    val localRepoPath = new File(tempDirectoryPath.toString).toPath.resolve(config.targetRepoName)
+
+    val localPrototypeKitPath = new File(tempDirectoryPath.toString).toPath.resolve("govuk-prototype-kit")
+    %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
+
+    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
     gitPush(localRepoPath.toString, config)
   }
 
