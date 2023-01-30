@@ -92,10 +92,27 @@ object MainV13 {
     localPrototypeKitPath.toFile.mkdir()
     %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
 
-    val kitFiles = localPrototypeKitPath.toFile.listFiles()
-    println(s"govuk-prototype-kit files: ${kitFiles.toList}")
+    println(s"localPrototypeKitPath: $localPrototypeKitPath")
+    println(s"localRepoPath: $localRepoPath")
+
+    val localPrototypeKitPathSize = localPrototypeKitPath.toFile.listFiles().length
+    val localRepoPathSize         = localRepoPath.toFile.listFiles().length
+
+    println(s"localRepoPath size: $localRepoPathSize")
+    println(s"localPrototypeKitPath size: $localPrototypeKitPathSize")
+
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
-    gitPush(localRepoPath.toString, config)
+
+    val expectedLocalRepoPathSize = localPrototypeKitPathSize + localRepoPathSize
+    val actualLocalRepoPathSize   = localRepoPath.toFile.listFiles().length
+
+    if (actualLocalRepoPathSize == expectedLocalRepoPathSize) {
+      gitPush(localRepoPath.toString, config)
+    } else {
+      throw new RuntimeException(
+        s"Expected $expectedLocalRepoPathSize but found $actualLocalRepoPathSize in $localRepoPath"
+      )
+    }
   }
 
 }
