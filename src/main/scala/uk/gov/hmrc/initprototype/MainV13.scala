@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
 
 import java.io.File
+import java.nio.file
 import scala.util.{Failure, Success, Try}
 
 object MainV13 {
@@ -87,10 +88,12 @@ object MainV13 {
     gitClone(tempDirectoryPath, config, credentials.token)
     val localRepoPath     = new File(tempDirectoryPath).toPath.resolve(config.targetRepoName)
 
-    val localPrototypeKitPath = new File(tempDirectoryPath).toPath.resolve("govuk-prototype-kit")
+    val localPrototypeKitPath: file.Path = new File(tempDirectoryPath).toPath.resolve("govuk-prototype-kit")
     localPrototypeKitPath.toFile.mkdir()
     %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
 
+    val kitFiles = localPrototypeKitPath.toFile.listFiles()
+    logger.debug(s"govuk-prototype-kit files: ${kitFiles.toList}")
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
     gitPush(localRepoPath.toString, config)
   }
