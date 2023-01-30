@@ -93,7 +93,7 @@ object MainV13 {
     %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
 
     val kitFiles = localPrototypeKitPath.toFile.listFiles()
-    logger.debug(s"govuk-prototype-kit files: ${kitFiles.toList}")
+    println(s"govuk-prototype-kit files: ${kitFiles.toList}")
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
     gitPush(localRepoPath.toString, config)
   }
