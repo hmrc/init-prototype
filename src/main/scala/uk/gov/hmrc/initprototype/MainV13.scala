@@ -103,8 +103,9 @@ object MainV13 {
     println(s"localRepoPath size: $localRepoPathSize")
     println(s"localPrototypeKitPath size: $localPrototypeKitPathSize")
 
-    val filesToDelete = Seq(
-      new File(s"${localPrototypeKitPath.toString}/.git"),
+    val gitFiles = new File(s"${localPrototypeKitPath.toString}/.git").listFiles().toSeq
+
+    val filesToDelete = gitFiles ++ Seq(
       new File(s"${localPrototypeKitPath.toString}/.gitignore"),
       new File(s"${localPrototypeKitPath.toString}/.npmrc")
     )
