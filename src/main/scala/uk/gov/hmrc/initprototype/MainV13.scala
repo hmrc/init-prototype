@@ -19,12 +19,13 @@ package uk.gov.hmrc.initprototype
 import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.filefilter.{FileFileFilter, FileFilterUtils, OrFileFilter}
+import org.apache.commons.io.filefilter.FileFilterUtils._
 import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
 
 import java.io.File
-import java.nio.file
 import java.nio.file.Files
 import scala.util.{Failure, Success, Try}
 import scala.reflect.io.Directory
@@ -94,14 +95,12 @@ object MainV13 {
 
     val originalLocalRepoFiles = localRepoPath.toFile.listFiles()
 
-    // Delete the git information from the prototype kit source before copying to local repo,
+    // Filter the git information from the prototype kit source before copying to local repo,
     // otherwise it will cause issues when pushing to remote destination repo
-    val gitDirectory = new Directory(new File(s"${localPrototypeKitPath.toString}/.git"))
-    gitDirectory.deleteRecursively()
-    Files.deleteIfExists(new File(s"${localPrototypeKitPath.toString}/.gitignore").toPath)
-    Files.deleteIfExists(new File(s"${localPrototypeKitPath.toString}/.npmrc").toPath)
+    val gitFilter: OrFileFilter =
+      new OrFileFilter(FileFilterUtils.nameFileFilter(".git"), FileFilterUtils.nameFileFilter(".gitignore"))
 
-    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
+    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitFilter)
 
     val updatedLocalRepoFiles = localRepoPath.toFile.listFiles()
 
