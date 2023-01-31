@@ -62,6 +62,8 @@ object MainV13 {
 
   def gitPush(localRepoPath: String, config: Config) = {
 
+    println(s"Within gitPush, localRepoPath length is: ${new File(localRepoPath).listFiles().length}")
+
     val dir = Path(localRepoPath)
     %('git, "add", ".", "-A")(dir)
     %('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
