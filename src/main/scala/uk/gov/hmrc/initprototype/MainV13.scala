@@ -25,6 +25,7 @@ import uk.gov.hmrc.initprototype.ArgParser.Config
 
 import java.io.File
 import java.nio.file
+import java.nio.file.Files
 import scala.util.{Failure, Success, Try}
 
 object MainV13 {
@@ -86,7 +87,6 @@ object MainV13 {
     val credentials = GithubCredentials(config.githubUsername, config.githubToken)
 
     val tempDirectoryPath = FileUtils.getTempDirectory.toString
-    //FileUtils.getTempDirectory.toPath
     gitClone(tempDirectoryPath, config, credentials.token)
     val localRepoPath     = new File(tempDirectoryPath).toPath.resolve(config.targetRepoName)
 
@@ -103,10 +103,17 @@ object MainV13 {
     println(s"localRepoPath size: $localRepoPathSize")
     println(s"localPrototypeKitPath size: $localPrototypeKitPathSize")
 
-    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
+    val filesToDelete = Seq(
+      new File(s"${localPrototypeKitPath.toString}/.git"),
+      new File(s"${localPrototypeKitPath.toString}/.gitignore"),
+      new File(s"${localPrototypeKitPath.toString}/.npmrc")
+    )
 
-//    val expectedLocalRepoPathSize = localPrototypeKitPathSize + localRepoPathSize
-//    val actualLocalRepoPathSize   = localRepoPath.toFile.listFiles().length
+    filesToDelete.foreach { fileToDelete =>
+      Files.deleteIfExists(fileToDelete.toPath)
+    }
+
+    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
 
     val updatedLocalRepoFiles = localRepoPath.toFile.listFiles()
     println("updatedLocalRepoFiles: ")
