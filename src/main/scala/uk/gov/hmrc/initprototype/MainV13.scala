@@ -27,6 +27,7 @@ import java.io.File
 import java.nio.file
 import java.nio.file.Files
 import scala.util.{Failure, Success, Try}
+import scala.reflect.io.Directory
 
 object MainV13 {
 
@@ -103,16 +104,10 @@ object MainV13 {
     println(s"localRepoPath size: $localRepoPathSize")
     println(s"localPrototypeKitPath size: $localPrototypeKitPathSize")
 
-    val gitFiles = new File(s"${localPrototypeKitPath.toString}/.git").listFiles().toSeq
-
-    val filesToDelete = gitFiles ++ Seq(
-      new File(s"${localPrototypeKitPath.toString}/.gitignore"),
-      new File(s"${localPrototypeKitPath.toString}/.npmrc")
-    )
-
-    filesToDelete.foreach { fileToDelete =>
-      Files.deleteIfExists(fileToDelete.toPath)
-    }
+    val gitDirectory = new Directory(new File(s"${localPrototypeKitPath.toString}/.git"))
+    gitDirectory.deleteRecursively()
+    Files.deleteIfExists(new File(s"${localPrototypeKitPath.toString}/.gitignore").toPath)
+    Files.deleteIfExists(new File(s"${localPrototypeKitPath.toString}/.npmrc").toPath)
 
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
 
