@@ -19,16 +19,13 @@ package uk.gov.hmrc.initprototype
 import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.filefilter.{FileFileFilter, FileFilterUtils, OrFileFilter}
-import org.apache.commons.io.filefilter.FileFilterUtils._
+import org.apache.commons.io.filefilter.FileFilterUtils
 import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
 
 import java.io.File
-import java.nio.file.Files
 import scala.util.{Failure, Success, Try}
-import scala.reflect.io.Directory
 
 object MainV13 {
 
@@ -65,6 +62,7 @@ object MainV13 {
 
   def gitPush(localRepoPath: String, config: Config) = {
     val dir = Path(localRepoPath)
+
     %('git, "add", ".", "-A")(dir)
     %('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
 
@@ -94,13 +92,15 @@ object MainV13 {
     %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
 
     val originalLocalRepoFiles = localRepoPath.toFile.listFiles()
+    localPrototypeKitPath.toFile.listFiles().foreach(file => println(file.getName))
 
     // Filter the git information from the prototype kit source before copying to local repo,
     // otherwise it will cause issues when pushing to remote destination repo
-    val gitFilter: OrFileFilter =
-      new OrFileFilter(FileFilterUtils.nameFileFilter(".git"), FileFilterUtils.nameFileFilter(".gitignore"))
+    val gitIgnoreFilter = FileFilterUtils.notFileFilter(
+      FileFilterUtils.nameFileFilter(""".gitignore""")
+    )
 
-    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitFilter)
+    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitIgnoreFilter)
 
     val updatedLocalRepoFiles = localRepoPath.toFile.listFiles()
 
