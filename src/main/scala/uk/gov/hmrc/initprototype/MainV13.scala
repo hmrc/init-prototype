@@ -19,7 +19,8 @@ package uk.gov.hmrc.initprototype
 import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.filefilter.FileFilterUtils
+import org.apache.commons.io.filefilter.FileFilterUtils.{and, directoryFileFilter, nameFileFilter}
+import org.apache.commons.io.filefilter.{FileFilterUtils, IOFileFilter}
 import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
@@ -96,11 +97,10 @@ object MainV13 {
 
     // Filter the git information from the prototype kit source before copying to local repo,
     // otherwise it will cause issues when pushing to remote destination repo
-    val gitIgnoreFilter = FileFilterUtils.notFileFilter(
-      FileFilterUtils.nameFileFilter(""".gitignore""")
-    )
+    val gitDirFilter =
+      FileFilterUtils.notFileFilter(and(directoryFileFilter, nameFileFilter(".git")))
 
-    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitIgnoreFilter)
+    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitDirFilter)
 
     val updatedLocalRepoFiles = localRepoPath.toFile.listFiles()
 
