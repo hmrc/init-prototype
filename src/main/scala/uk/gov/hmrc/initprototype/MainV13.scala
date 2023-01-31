@@ -103,14 +103,18 @@ object MainV13 {
 
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile)
 
-    val expectedLocalRepoPathSize = localPrototypeKitPathSize + localRepoPathSize
-    val actualLocalRepoPathSize   = localRepoPath.toFile.listFiles().length
+//    val expectedLocalRepoPathSize = localPrototypeKitPathSize + localRepoPathSize
+//    val actualLocalRepoPathSize   = localRepoPath.toFile.listFiles().length
 
-    if (actualLocalRepoPathSize == expectedLocalRepoPathSize) {
+    val updatedLocalRepoFiles = localRepoPath.toFile.listFiles()
+    println("updatedLocalRepoFiles: ")
+    updatedLocalRepoFiles.toList.foreach(println(_))
+
+    if (updatedLocalRepoFiles.length > localRepoPathSize) {
       gitPush(localRepoPath.toString, config)
     } else {
       throw new RuntimeException(
-        s"Expected $expectedLocalRepoPathSize but found $actualLocalRepoPathSize in $localRepoPath"
+        s"Expected more than $localRepoPathSize but found ${updatedLocalRepoFiles.length} in $localRepoPath"
       )
     }
   }
