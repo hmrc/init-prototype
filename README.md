@@ -1,8 +1,5 @@
 # init-prototype
 
-> **Note**
-> new prototype creation is current pinned at v12.3.0 of the govuk-prototype kit because from v13 creation is now via an npx command rather than copying the repo as a template. Work in progress to support v13 is happening under PLATUI-2102.
-
 This is an SBT library for building Gov.UK Design System prototypes. It is used as part 
 of the HMRC CI/CD environment.
 
