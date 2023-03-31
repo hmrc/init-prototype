@@ -157,23 +157,6 @@ sbt -Dgithub.apiToken=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN "generateHerokuR
 sbt generatePackageLockReport
 ```
 
-## Local testing of prototype creation
-It is possible to test the creation of prototypes locally, although it does require to prior setup due to that fact 
-`init-protoype` normally runs as part of a larger `create-a-prototype` job which handles some environment setup.
-
-### Local testing prerequisites
-You'll need:
-* A cloneable repository for your prototype from Github
-* A Github [personal access token](https://github.com/settings/tokens/)
-
-When prompted `Multiple main classes detected. Select one to run:`, you should enter the the number relating to 
-`MainV13`. You may wish to comment the lines in `MainV13.scala` relating to pushing your files to Git.
-
-```shell script
-sbt "run  --github-username=REPLACE_WITH_GITHUB_USER_NAME --github-token=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN 
---target-github-host=github.com --target-git-org=hmrc --target-repo-name=REPLACE_WITH_GITHUB_REPO_NAME"
-```
-
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
