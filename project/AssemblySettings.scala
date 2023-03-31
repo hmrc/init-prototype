@@ -6,7 +6,7 @@ import sbtassembly._
 object AssemblySettings {
   def apply() = Seq(
     assembly / assemblyJarName := "init-prototype.jar",
-    assembly / mainClass := Some("uk.gov.hmrc.initprototype.MainV13"),
+    assembly / mainClass := Some("uk.gov.hmrc.initprototype.Main"),
     assembly / assemblyMergeStrategy := {
       case "module-info.class"                                      => MergeStrategy.discard
       case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.first

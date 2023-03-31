@@ -20,7 +20,7 @@ import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.FileFilterUtils.{and, directoryFileFilter, nameFileFilter}
-import org.apache.commons.io.filefilter.{FileFilterUtils, IOFileFilter}
+import org.apache.commons.io.filefilter.{FileFilterUtils}
 import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
