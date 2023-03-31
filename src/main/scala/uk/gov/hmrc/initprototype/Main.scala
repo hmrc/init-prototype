@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.initprototype
 
-import java.io.File
-
 import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
 import org.apache.commons.io.FileUtils
+import org.apache.commons.io.filefilter.FileFilterUtils.{and, directoryFileFilter, nameFileFilter}
+import org.apache.commons.io.filefilter.{FileFilterUtils}
 import org.slf4j
 import org.slf4j.LoggerFactory
 import uk.gov.hmrc.initprototype.ArgParser.Config
-import uk.gov.hmrc.initprototype.PrototypeKitReleaseUrlResolver.{ErrorMessage, ZipBallUrl}
 
+import java.io.File
 import scala.util.{Failure, Success, Try}
 
 object Main {
@@ -62,8 +62,8 @@ object Main {
   }
 
   def gitPush(localRepoPath: String, config: Config) = {
-
     val dir = Path(localRepoPath)
+
     %('git, "add", ".", "-A")(dir)
     %('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
 
@@ -84,21 +84,21 @@ object Main {
   def start(config: Config): Unit = {
     val credentials = GithubCredentials(config.githubUsername, config.githubToken)
 
-    val eitherErrorOrUrl: Either[ErrorMessage, ZipBallUrl] =
-      PrototypeKitReleaseUrlResolver.getLatestZipballUrl(config.templateRepoApiUrl, Some(config.githubToken))
+    val tempDirectoryPath = FileUtils.getTempDirectory.toString
+    gitClone(tempDirectoryPath, config, credentials.token)
+    val localRepoPath     = new File(tempDirectoryPath).toPath.resolve(config.targetRepoName)
 
-    eitherErrorOrUrl match {
-      case Left(e)             =>
-        throw new RuntimeException(e)
-      case Right(githubZipUrl) =>
-        val tempPath             = FileUtils.getTempDirectory.toPath
-        gitClone(tempPath.toString, config, credentials.token)
-        val artifactDownloadPath = tempPath.resolve("prototype-template-archive.zip").toString
-        val localExplodedPath    = new GithubArtifactDownloader().getRepoZipAndExplode(githubZipUrl, artifactDownloadPath)
-        val localRepoPath        = new File(tempPath.toString).toPath.resolve(config.targetRepoName)
-        FileUtils.copyDirectory(new File(localExplodedPath), localRepoPath.toFile)
-        gitPush(localRepoPath.toString, config)
-    }
+    val localPrototypeKitPath = new File(tempDirectoryPath).toPath.resolve("govuk-prototype-kit")
+    localPrototypeKitPath.toFile.mkdir()
+    %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
+
+    // Filter the git information from the prototype kit source before copying to local repo,
+    // otherwise it will cause issues when pushing to remote destination repo
+    val gitDirFilter =
+      FileFilterUtils.notFileFilter(and(directoryFileFilter, nameFileFilter(".git")))
+
+    FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitDirFilter)
+    gitPush(localRepoPath.toString, config)
   }
 
 }
