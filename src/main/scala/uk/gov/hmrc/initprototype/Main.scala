@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.initprototype
 
-import ammonite.ops.{%, _}
 import ch.qos.logback.classic.{Level, Logger}
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.filefilter.FileFilterUtils.{and, directoryFileFilter, nameFileFilter}
-import org.apache.commons.io.filefilter.{FileFilterUtils}
+import org.apache.commons.io.filefilter.FileFilterUtils
 import org.slf4j
 import org.slf4j.LoggerFactory
+import os.{Path, proc}
 import uk.gov.hmrc.initprototype.ArgParser.Config
 
 import java.io.File
@@ -56,20 +56,19 @@ object Main {
     val dir = Path(localRepoPath)
 
     val repoPath = new File(localRepoPath).toPath.resolve(config.targetRepoName).toString
-    %('rm, "-rf", repoPath)(dir)
+    proc('rm, "-rf", repoPath).call(dir)
 
-    %('git, "clone", repoUrl)(dir)
+    proc('git, "clone", repoUrl).call(dir)
   }
 
   def gitPush(localRepoPath: String, config: Config) = {
-    val dir = Path(localRepoPath)
+    val dir = os.Path(localRepoPath)
 
-    %('git, "add", ".", "-A")(dir)
-    %('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}")(dir)
+    proc('git, "add", ".", "-A").call(dir)
+    proc('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}").call(dir)
 
     logger.debug(s"Pushing: $localRepoPath")
-    // we use Try to protect the token from being printed on the console in case of an error
-    val tryOfPushResult = Try(%%('git, "push")(dir))
+    val tryOfPushResult: Try[os.CommandResult] = Try(proc('git, "push").call(dir))
 
     tryOfPushResult match {
       case Success(pushResult) =>
@@ -90,7 +89,7 @@ object Main {
 
     val localPrototypeKitPath = new File(tempDirectoryPath).toPath.resolve("govuk-prototype-kit")
     localPrototypeKitPath.toFile.mkdir()
-    %('npx, "govuk-prototype-kit", "create")(Path(localPrototypeKitPath))
+    proc('npx, "govuk-prototype-kit", "create").call(os.Path(localPrototypeKitPath))
 
     // Filter the git information from the prototype kit source before copying to local repo,
     // otherwise it will cause issues when pushing to remote destination repo

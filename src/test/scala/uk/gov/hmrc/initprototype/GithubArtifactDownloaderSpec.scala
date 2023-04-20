@@ -17,8 +17,6 @@
 package uk.gov.hmrc.initprototype
 
 import java.io.{File, FileInputStream}
-
-import ammonite.ops._
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.http.RequestMethod._
@@ -26,6 +24,7 @@ import org.apache.commons.io.{FileUtils, IOUtils}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.zeroturnaround.zip.ZipUtil
+import os.{Path, proc}
 
 class GithubArtifactDownloaderSpec extends AnyFunSpec with WireMockEndpoints with Matchers {
 
@@ -51,7 +50,7 @@ class GithubArtifactDownloaderSpec extends AnyFunSpec with WireMockEndpoints wit
         .getRepoZipAndExplode(url, tempDirectoryPath.toPath.resolve("some-archive.zip").toString)
 
       explodedPath shouldBe tempDirectoryPath.toPath.resolve("some-archive.zip/foo").toString
-      val lsResult = %%('ls)(Path(explodedPath))
+      val lsResult = proc('ls).call(Path(explodedPath))
       lsResult.out.string should startWith("bar.js")
     }
   }
