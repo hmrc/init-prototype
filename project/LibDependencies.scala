@@ -9,7 +9,6 @@ object LibDependencies {
     "com.typesafe.scala-logging" %% "scala-logging"   % "3.5.0",
     "commons-io"                  % "commons-io"      % "2.7",
     "org.scalaj"                 %% "scalaj-http"     % "2.3.0",
-    "com.lihaoyi"                %% "ammonite-ops"    % "0.8.2",
     "com.typesafe.play"          %% "play-json"       % "2.9.0",
     "com.typesafe"                % "config"          % "1.4.0",
     "com.lihaoyi"                %% "requests"        % "0.6.9",
