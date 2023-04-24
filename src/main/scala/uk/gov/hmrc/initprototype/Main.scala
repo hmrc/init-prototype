@@ -56,19 +56,19 @@ object Main {
     val dir = Path(localRepoPath)
 
     val repoPath = new File(localRepoPath).toPath.resolve(config.targetRepoName).toString
-    proc('rm, "-rf", repoPath).call(dir)
+    proc("rm", "-rf", repoPath).call(dir)
 
-    proc('git, "clone", repoUrl).call(dir)
+    proc("git", "clone", repoUrl).call(dir)
   }
 
   def gitPush(localRepoPath: String, config: Config) = {
     val dir = Path(localRepoPath)
 
-    proc('git, "add", ".", "-A").call(dir)
-    proc('git, "commit", "-m", s"Creating new prototype ${config.targetRepoName}").call(dir)
+    proc("git", "add", ".", "-A").call(dir)
+    proc("git", "commit", "-m", s"Creating new prototype ${config.targetRepoName}").call(dir)
 
     logger.debug(s"Pushing: $localRepoPath")
-    val tryOfPushResult: Try[os.CommandResult] = Try(proc('git, "push").call(dir))
+    val tryOfPushResult: Try[os.CommandResult] = Try(proc("git", "push").call(dir))
 
     tryOfPushResult match {
       case Success(pushResult) =>
@@ -89,7 +89,7 @@ object Main {
 
     val localPrototypeKitPath = new File(tempDirectoryPath).toPath.resolve("govuk-prototype-kit")
     localPrototypeKitPath.toFile.mkdir()
-    proc('npx, "govuk-prototype-kit", "create").call(Path(localPrototypeKitPath))
+    proc("npx", "govuk-prototype-kit", "create").call(Path(localPrototypeKitPath))
 
     // Filter the git information from the prototype kit source before copying to local repo,
     // otherwise it will cause issues when pushing to remote destination repo
