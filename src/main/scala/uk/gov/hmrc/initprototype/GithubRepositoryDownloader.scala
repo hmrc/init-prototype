@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.initprototype
 
-import os.CommandResult
+import os.{CommandResult, proc}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration.Duration
@@ -27,7 +27,7 @@ class GithubRepositoryDownloader {
   def checkoutRepositories(repositories: List[String], into: String): Seq[CommandResult] = {
     val results: Seq[Future[CommandResult]] = repositories.map { repository =>
       Future {
-        os.proc("git", "clone", "--depth", "1", s"https://github.com/hmrc/$repository.git")
+        proc("git", "clone", "--depth", "1", s"https://github.com/hmrc/$repository.git")
           .call(cwd = os.pwd / into, check = false)
       }
     }
