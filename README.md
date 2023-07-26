@@ -156,6 +156,21 @@ The output will be saved to `package-lock-analysis.tsv`.
 sbt -Dgithub.apiToken=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN "generateHerokuReport report.txt"
 sbt generatePackageLockReport
 ```
+## Updating repository.yaml files for prototypes where YAML contains `prototype-auto-publish`
+The `updateRepositoryYaml` task will 
+- Parse a local JSON file of prototype repository details
+- Shallow clone the prototypes repositories into a local directory
+- Check to see if the `repository.yaml` contains `prototype-auto-publish` but not `prototype-name`
+- Add a prototype name based on the `prototype-url`
+- Confirm with the user whether to update the files (based on stdin)  
+- Push the change to `main` is possible, or to a branch if cannot merge directly to `main`
+- Write the name of updated repositories in either `pushed-to-main.txt` or `pushed-to-branch.txt`
+
+The JSON can be retrieved from this endpoint:
+https://catalogue.tax.service.gov.uk/api/v2/repositories?archived=false&repoType=Prototype
+
+The current task will expect the JSON file to be named `prototypes-from-catalogue.json`, and will check out to branch
+`PLATUI-2475_bulk-update-repository-yaml` if cannot push to `main`.
 
 ## Local testing of prototype creation
 It is possible to test the creation of prototypes locally, although it does require to prior setup due to that fact
