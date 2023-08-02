@@ -61,14 +61,12 @@ object Main {
     proc("git", "clone", repoUrl).call(dir)
   }
 
-  def gitPush(localRepoPath: String, config: Config) = {
-    val dir = Path(localRepoPath)
-
+  def gitPush(dir: Path, commitMessage: String, additionalArgs: String*) = {
     proc("git", "add", ".", "-A").call(dir)
-    proc("git", "commit", "-m", s"Creating new prototype ${config.targetRepoName}").call(dir)
+    proc("git", "commit", "-m", commitMessage).call(dir)
 
-    logger.debug(s"Pushing: $localRepoPath")
-    val tryOfPushResult: Try[os.CommandResult] = Try(proc("git", "push").call(dir))
+    logger.debug(s"Pushing: $dir")
+    val tryOfPushResult: Try[os.CommandResult] = Try(proc("git", "push", additionalArgs).call(dir))
 
     tryOfPushResult match {
       case Success(pushResult) =>
@@ -97,7 +95,7 @@ object Main {
       FileFilterUtils.notFileFilter(and(directoryFileFilter, nameFileFilter(".git")))
 
     FileUtils.copyDirectory(localPrototypeKitPath.toFile, localRepoPath.toFile, gitDirFilter)
-    gitPush(localRepoPath.toString, config)
+    gitPush(Path(localRepoPath.toString), s"Creating new prototype ${config.targetRepoName}")
   }
 
 }

@@ -24,6 +24,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class GithubRepositoryDownloader {
 
+  def checkoutRepository(repository: String, into: String): CommandResult =
+    checkoutRepositories(List(repository), into).head
+
   def checkoutRepositories(repositories: List[String], into: String): Seq[CommandResult] = {
     val results: Seq[Future[CommandResult]] = repositories.map { repository =>
       Future {
