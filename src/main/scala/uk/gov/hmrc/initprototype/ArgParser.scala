@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ object ArgParser {
 
   val parser = new scopt.OptionParser[Config]("init-repository") {
 
-    override def showUsageOnError = true
+    override def showUsageOnError = Some(true)
 
     head(s"\nInit-Repository", s"$currentVersion\n")
 

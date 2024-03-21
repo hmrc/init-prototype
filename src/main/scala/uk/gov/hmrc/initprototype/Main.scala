@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ object Main {
 
   val logger = com.typesafe.scalalogging.Logger("init-prototype")
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
 
     val root: Logger = LoggerFactory.getLogger(slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
     ArgParser.parser.parse(args, Config()) foreach { config =>

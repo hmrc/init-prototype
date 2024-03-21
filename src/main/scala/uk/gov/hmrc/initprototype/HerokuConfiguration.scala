@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import java.time.Period
 import scala.concurrent.duration.{Duration, MILLISECONDS}
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class HerokuConfiguration {
   private val config: Config                        = ConfigFactory.load()
@@ -33,7 +33,7 @@ class HerokuConfiguration {
   val jobTimeout: Duration                          = Duration(config.getInt("heroku.jobTimeoutMs"), MILLISECONDS)
   val connTimeoutMs: Int                            = config.getInt("heroku.connTimeoutMs")
   val readTimeoutMs: Int                            = config.getInt("heroku.readTimeoutMs")
-  val administratorEmails: Seq[String]              = config.getStringList("heroku.administratorEmails").asScala
+  val administratorEmails: Seq[String]              = config.getStringList("heroku.administratorEmails").asScala.toSeq
   val periodAfterWhichAppConsideredInactive: Period = Period.ofDays(84)
   val herokuAppsToKeepRunning: Set[String]          = config.getStringList("heroku.appsToKeepRunning").asScala.toSet
 }
