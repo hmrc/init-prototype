@@ -27,6 +27,18 @@ sbt "run  --github-username=REPLACE_WITH_GITHUB_USER_NAME --github-token=REPLACE
 --target-github-host=github.com --target-git-org=hmrc --target-repo-name=REPLACE_WITH_GITHUB_REPO_NAME"
 ```
 
+## Removed Functionality
+
+As of [PLATUI-2906](https://github.com/hmrc/init-prototype/pull/34), the following tasks have been removed from this repo:
+
+- `HerokuGenerateSpinDownListTask`
+- `HerokuReportTask`
+- `HerokuSpinDownTask`
+- `PackageLockReportTask`
+- `PrototypeNameAdditionTask`
+
+The helper script `bin/compare-repositories.sh` has also been removed.
+
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
