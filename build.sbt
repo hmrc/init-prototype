@@ -5,7 +5,7 @@ lazy val InitPrototype = Project(libName, file("."))
   .settings(
     majorVersion := 0,
     isPublicArtefact := true,
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.12",
     scalacOptions += "-deprecation",
     libraryDependencies ++= LibDependencies.compile ++ LibDependencies.test,
     resolvers += Resolver.typesafeRepo("releases"),
