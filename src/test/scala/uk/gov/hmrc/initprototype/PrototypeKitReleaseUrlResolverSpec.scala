@@ -56,11 +56,11 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
         )
       )
 
-      PrototypeKitReleaseUrlResolver
-        .getLatestZipballUrl(endpointMockUrl)
-        .right
-        .value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
-
+      val result = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl)
+      result match {
+        case Right(value) => value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
+        case Left(error) => fail(s"Expected Right, but got Left($error)")
+      }
     }
 
     it("should be correctly extracted if Github requires authorisation") {
@@ -79,10 +79,11 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
         )
       )
 
-      PrototypeKitReleaseUrlResolver
-        .getLatestZipballUrl(endpointMockUrl, Some("1111111111"))
-        .right
-        .value shouldBe "https://url-to-zip-archive"
+      val result = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl, Some("1111111111"))
+      result match {
+        case Right(value) => value shouldBe "https://url-to-zip-archive"
+        case Left(error) => fail(s"Expected Right, but got Left($error)")
+      }
     }
 
     it("should be correctly extracted if Github requires a different authorisation token") {
@@ -101,10 +102,11 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
         )
       )
 
-      PrototypeKitReleaseUrlResolver
-        .getLatestZipballUrl(endpointMockUrl, Some("2222222222"))
-        .right
-        .value shouldBe "https://url-to-zip-archive"
+      val result = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl, Some("2222222222"))
+      result match {
+        case Right(value) => value shouldBe "https://url-to-zip-archive"
+        case Left(error) => fail(s"Expected Right, but got Left($error)")
+      }
     }
 
     it("should throw an error if authorisation fails") {
@@ -169,11 +171,11 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
         )
       )
 
-      PrototypeKitReleaseUrlResolver
-        .getLatestZipballUrl(endpointMockUrl)
-        .right
-        .value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
-
+      val result = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl)
+      result match {
+        case Right(value) => value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
+        case Left(error) => fail(s"Expected Right, but got Left($error)")
+      }
     }
 
     it("should follow redirects retrieved from github and pass on any authorisation") {
@@ -210,11 +212,12 @@ class PrototypeKitReleaseUrlResolverSpec extends AnyFunSpec with WireMockEndpoin
         )
       )
 
-      PrototypeKitReleaseUrlResolver
-        .getLatestZipballUrl(endpointMockUrl, Some("abc"))
-        .right
-        .value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
-    }
+val result = PrototypeKitReleaseUrlResolver.getLatestZipballUrl(endpointMockUrl, Some("abc"))
+  result match {
+    case Right(value) => value shouldBe "https://api.github.com/repos/alphagov/govuk_prototype_kit/zipball/v5.1.0"
+    case Left(error) => fail(s"Expected Right, but got Left($error)")
+  }
+}
 
     it("should produce error message on http error") {
 

@@ -24,7 +24,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 
 import scala.util.Try
-import collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfterEach {
 
@@ -47,11 +47,12 @@ trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfter
   override def beforeAll(): Unit =
     endpointServer.start()
 
-  def printMappings(): Unit =
-    asScalaBuffer(endpointMock.allStubMappings().getMappings).foreach { s =>
+  def printMappings(): Unit = {
+    val mappings = endpointMock.allStubMappings().getMappings
+    mappings.asScala.foreach { s =>
       println(s)
     }
-
+  }
 }
 
 object PortTester {

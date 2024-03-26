@@ -51,7 +51,7 @@ class GithubArtifactDownloaderSpec extends AnyFunSpec with WireMockEndpoints wit
 
       explodedPath shouldBe tempDirectoryPath.toPath.resolve("some-archive.zip/foo").toString
       val lsResult = proc("ls").call(Path(explodedPath))
-      lsResult.out.string should startWith("bar.js")
+      lsResult.out.text() should startWith("bar.js")
     }
   }
 
