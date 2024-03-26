@@ -6,6 +6,14 @@ of the HMRC CI/CD environment.
 Also included in this repository are a collection of SBT build tasks for managing the HMRC
 prototyping environment on Heroku.
 
+## How This Works
+`Main.scala` does the following for the creation of a prototype:
+- Takes some GitHub config
+- Clones the specified repository
+- Proceeds to run npx `govuk-prototype-kit create`
+- Commits the change to the repo
+- Tries to push the changes
+
 ## Heroku prerequisites
 
 To run the main build task, you will need:
