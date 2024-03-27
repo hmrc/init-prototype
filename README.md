@@ -31,7 +31,7 @@ You'll need:
 * A Github [personal access token](https://github.com/settings/tokens/)
 
 ```shell script
-sbt "run  --github-username=REPLACE_WITH_GITHUB_USER_NAME --github-token=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN 
+sbt "run --github-token=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN 
 --target-github-host=github.com --target-git-org=hmrc --target-repo-name=REPLACE_WITH_GITHUB_REPO_NAME"
 ```
 
@@ -46,6 +46,9 @@ As of [PLATUI-2906](https://github.com/hmrc/init-prototype/pull/34), the followi
 - `PrototypeNameAdditionTask`
 
 The helper script `bin/compare-repositories.sh` has also been removed.
+
+## Testing
+There are currently no tests against the Main object, as this is a simple command line script.
 
 ### License
 

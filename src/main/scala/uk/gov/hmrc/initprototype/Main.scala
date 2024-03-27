@@ -47,10 +47,10 @@ object Main {
     }
   }
 
-  def gitClone(localRepoPath: String, config: Config, token: String) = {
+  def gitClone(localRepoPath: String, config: Config) = {
 
     val repoUrl =
-      s"https://$token:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
+      s"https://${config.githubToken}:x-oauth-basic@${config.targetGithubHost}/${config.targetOrg}/${config.targetRepoName}.git"
 
     logger.debug(s"Cloning to: $localRepoPath")
     val dir = Path(localRepoPath)
@@ -79,10 +79,8 @@ object Main {
   }
 
   def start(config: Config): Unit = {
-    val credentials = GithubCredentials(config.githubUsername, config.githubToken)
-
     val tempDirectoryPath = FileUtils.getTempDirectory.toString
-    gitClone(tempDirectoryPath, config, credentials.token)
+    gitClone(tempDirectoryPath, config)
     val localRepoPath     = new File(tempDirectoryPath).toPath.resolve(config.targetRepoName)
 
     val localPrototypeKitPath = new File(tempDirectoryPath).toPath.resolve("govuk-prototype-kit")

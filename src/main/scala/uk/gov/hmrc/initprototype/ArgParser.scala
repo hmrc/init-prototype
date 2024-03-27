@@ -18,12 +18,8 @@ package uk.gov.hmrc.initprototype
 
 object ArgParser {
 
-  val DEFAULT_BOOTSTRAP_TAG = "0.1.0"
-
   case class Config(
-    githubUsername: String = "",
     githubToken: String = "",
-    templateRepoApiUrl: String = "",
     targetGithubHost: String = "",
     targetOrg: String = "",
     targetRepoName: String = "",
@@ -40,10 +36,6 @@ object ArgParser {
 
     help("help") text "prints this usage text"
 
-    opt[String]("github-username") action { (x, c) =>
-      c.copy(githubUsername = x)
-    } text "github username"
-
     opt[String]("github-token") action { (x, c) =>
       c.copy(githubToken = x)
     } text "github token"
@@ -55,10 +47,6 @@ object ArgParser {
     opt[String]("target-git-org") action { (x, c) =>
       c.copy(targetOrg = x)
     } text "target github's org name"
-
-    opt[String]("template-repo-api-url") action { (x, c) =>
-      c.copy(templateRepoApiUrl = x)
-    } text "the api url of the template github repository (eg: 'https://api.github.com/repos/alphagov/govuk_prototype_kit')"
 
     opt[String]("target-repo-name") action { (x, c) =>
       c.copy(targetRepoName = x)
