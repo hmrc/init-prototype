@@ -16,3 +16,9 @@ spin-down-list.txt
 .bsp
 test-heroku-report.txt
 test-package-lock-report.txt
+.bloop
+.metals
+.vscode
+project/.bloop
+project/metals.sbt
+project/project
