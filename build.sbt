@@ -7,7 +7,7 @@ lazy val InitPrototype = Project(libName, file("."))
     isPublicArtefact := true,
     scalaVersion := "2.13.12",
     scalacOptions += "-deprecation",
-    libraryDependencies ++= LibDependencies.compile ++ LibDependencies.test,
+    libraryDependencies ++= LibDependencies.compile,
     resolvers += Resolver.typesafeRepo("releases"),
     AssemblySettings(),
     addArtifact(Compile / assembly / artifact, assembly)
