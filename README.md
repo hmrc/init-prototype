@@ -1,54 +1,14 @@
 # init-prototype
 
-This is an SBT library for building Gov.UK Design System prototypes. It is used as part 
-of the HMRC CI/CD environment.
+> :warning: **WARNING** :warning:
+>
+> This library is no longer in use. All prototype initialisation has now been moved to Build and Deploy.
 
-Also included in this repository are a collection of SBT build tasks for managing the HMRC
-prototyping environment on Heroku.
+This was an SBT library for building Gov.UK Design System prototypes. It also included a collection of SBT build tasks 
+for managing the HMRC prototyping environment on Heroku. It was used as part of the HMRC CI/CD environment. 
 
-## How This Works
-`Main.scala` does the following for the creation of a prototype:
-- Takes some GitHub config
-- Clones the specified repository
-- Proceeds to run npx `govuk-prototype-kit create`
-- Commits the change to the repo
-- Tries to push the changes
+`init-prototype` was deprecated in 2024 as the functionality was made native in Build and Deploy.
 
-## Heroku prerequisites
-
-To run the main build task, you will need:
-* a Heroku account linked to your HMRC email address
-* be a member and have admin access to the HMRC team
-* have the heroku cli installed locally, or have a Heroku API Key generated from the [Heroku 'Manage Account' settings page](https://dashboard.heroku.com/account)
-
-## Local testing of prototype creation
-It is possible to test the creation of prototypes locally, although it does require some prior setup due to that fact
-`init-protoype` normally runs as part of a larger `create-a-prototype` job which handles some environment setup.
-
-### Local testing prerequisites
-You'll need:
-* A cloneable repository for your prototype from Github
-* A Github [personal access token](https://github.com/settings/tokens/)
-
-```shell script
-sbt "run --github-token=REPLACE_WITH_GITHUB_PERSONAL_ACCESS_TOKEN 
---target-github-host=github.com --target-git-org=hmrc --target-repo-name=REPLACE_WITH_GITHUB_REPO_NAME"
-```
-
-## Removed Functionality
-
-As of [PLATUI-2906](https://github.com/hmrc/init-prototype/pull/34), the following tasks have been removed from this repo:
-
-- `HerokuGenerateSpinDownListTask`
-- `HerokuReportTask`
-- `HerokuSpinDownTask`
-- `PackageLockReportTask`
-- `PrototypeNameAdditionTask`
-
-The helper script `bin/compare-repositories.sh` has also been removed.
-
-## Testing
-There are currently no tests against the Main object, as this is a simple command line script.
 
 ### License
 
